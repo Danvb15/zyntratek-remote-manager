@@ -1,10 +1,11 @@
 # Zyntratek Remote Manager
 
-[![Release Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](RELEASE.md)
-[![Security Status](https://img.shields.io/badge/security-hardened-emerald.svg)](SECURITY.md)
+[![Release Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v1.0.0)
+[![Download EXE](https://img.shields.io/badge/download-Windows%20.exe-emerald.svg)](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v1.0.0)
+[![Security Status](https://img.shields.io/badge/security-hardened-emerald.svg)](#-arquitectura-de-seguridad-y-custodia-nativa)
 [![License](https://img.shields.io/badge/license-Proprietary-slate.svg)](#)
 
-**Zyntratek Remote Manager** es una aplicación de escritorio profesional de alto rendimiento diseñada para la administración centralizada y custodia segura de conexiones remotas **SSH** y **RDP**.
+**Zyntratek Remote Manager** es una aplicación de escritorio profesional de alto rendimiento diseñada para la administración centralizada y custodia segura de conexiones remotas **SSH**, **RDP** y **Consolas WEB**.
 
 Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, MobaXterm y Royal TS, Zyntratek Remote Manager destaca por su arquitectura propia de aislamiento de secretos, garantizando que **ninguna contraseña ni clave privada sea almacenada en texto plano ni en la base de datos**.
 
@@ -32,6 +33,12 @@ Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, M
 * **Protocolo RDP NATIVO**:
   * Lanzamiento directo de `mstsc.exe` en Windows y `FreeRDP` en Linux/macOS.
   * Monitoreo de procesos y purga automática de credenciales huérfanas al iniciar el sistema.
+* **Consolas WEB (HTTP / HTTPS)**:
+  * Integración nativa de paneles de administración (Proxmox VE, pfSense, Portainer, Synology, iDRAC, Unifi).
+  * Lanzamiento en ventana ejecutable nativa (`WebviewWindowBuilder`) que omite restricciones de cabecera `X-Frame-Options`.
+* **Tutorial de Inicio Interactivo (Onboarding)**:
+  * Guía explicativa integrada en el primer lanzamiento para la creación de credenciales cifradas y asignación de conexiones.
+  * Acceso permanente desde el botón `?` (Guía) en la barra superior.
 * **Gestión de Conexiones y Vault**:
   * Organización en carpetas jerárquicas y etiquetas personalizables con colores.
   * Buscador global rápido con atajo `Cmd+K` / `Ctrl+K` y creación rápida `Cmd+N` / `Ctrl+N`.
@@ -41,7 +48,12 @@ Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, M
 
 ## 🚀 INSTALACIÓN Y COMPILACIÓN
 
-### Requisitos Previos:
+### Descargar Ejecutables de Producción:
+Descarga el instalador directamente desde la página oficial de [Releases en GitHub](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v1.0.0):
+* 📄 **Instalador Exe**: `Zyntratek Remote Manager_1.0.0_x64-setup.exe`
+* 📄 **Instalador MSI**: `Zyntratek Remote Manager_1.0.0_x64_en-US.msi`
+
+### Requisitos para Desarrolladores:
 * Node.js v20+
 * Rust Stable (v1.75+)
 * Tauri CLI v2 (`npm install -g @tauri-apps/cli@latest`)
@@ -65,16 +77,16 @@ npm run tauri build
 
 ## 🛠️ PLATAFORMAS SOPORTADAS
 
-| Plataforma | Soporte RDP Nativo | Soporte SSH Nativo | OS Keyring |
-| :--- | :---: | :---: | :---: |
-| **Windows 10 / 11** | `mstsc.exe` (WinCred) | `russh` + `xterm.js` | Windows Credential Manager |
-| **Linux (Ubuntu/Fedora)** | `xfreerdp` (stdin) | `russh` + `xterm.js` | SecretService / KWallet |
-| **macOS (Intel / Apple Silicon)** | `FreeRDP` | `russh` + `xterm.js` | macOS Keychain |
+| Plataforma | Soporte RDP Nativo | Soporte SSH Nativo | Consolas WEB | OS Keyring |
+| :--- | :---: | :---: | :---: | :---: |
+| **Windows 10 / 11** | `mstsc.exe` (WinCred) | `russh` + `xterm.js` | Ventana Nativa Webview | Windows Credential Manager |
+| **Linux (Ubuntu/Fedora)** | `xfreerdp` (stdin) | `russh` + `xterm.js` | Ventana Nativa Webview | SecretService / KWallet |
+| **macOS (Intel / Apple Silicon)** | `FreeRDP` | `russh` + `xterm.js` | Ventana Nativa Webview | macOS Keychain |
 
 ---
 
 ## 📄 DOCUMENTACIÓN DE REFERENCIA
 
-* [`SECURITY.md`](file:///c:/Users/danie/Documents/zyntratek-remote-manager/SECURITY.md): Política de seguridad y modelo de amenazas.
-* [`RELEASE.md`](file:///c:/Users/danie/Documents/zyntratek-remote-manager/RELEASE.md): Política de lanzamientos, firmas de código y versionado.
-* [`TROUBLESHOOTING.md`](file:///c:/Users/danie/Documents/zyntratek-remote-manager/TROUBLESHOOTING.md): Guía de solución de problemas frecuentes.
+* [`SECURITY.md`](SECURITY.md): Política de seguridad y modelo de amenazas.
+* [`RELEASE.md`](RELEASE.md): Política de lanzamientos, firmas de código y versionado.
+* [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md): Guía de solución de problemas frecuentes.
