@@ -50,28 +50,51 @@ Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, M
 
 ### Descargar Ejecutables de Producción:
 Descarga el instalador directamente desde la página oficial de [Releases en GitHub](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v1.0.0):
-* 📄 **Instalador Exe**: `Zyntratek Remote Manager_1.0.0_x64-setup.exe`
-* 📄 **Instalador MSI**: `Zyntratek Remote Manager_1.0.0_x64_en-US.msi`
+* 📄 **Windows EXE**: `Zyntratek Remote Manager_1.0.0_x64-setup.exe`
+* 📄 **Windows MSI**: `Zyntratek Remote Manager_1.0.0_x64_en-US.msi`
+* 🐧 **Linux AppImage**: `zyntratek-remote-manager_1.0.0_amd64.AppImage`
+* 🐧 **Linux DEB**: `zyntratek-remote-manager_1.0.0_amd64.deb`
+
+### 🐧 Ejecución en Linux desde la Terminal:
+
+#### Opción A: Paquete Portable AppImage (Ubuntu, Fedora, Arch, Manjaro)
+```bash
+# 1. Dar permisos de ejecución al archivo AppImage
+chmod +x zyntratek-remote-manager_1.0.0_amd64.AppImage
+
+# 2. Iniciar directamente desde la terminal
+./zyntratek-remote-manager_1.0.0_amd64.AppImage
+```
+
+#### Opción B: Instalación de Paquete `.deb` (Debian, Ubuntu, Linux Mint)
+```bash
+# 1. Instalar el paquete .deb mediante terminal
+sudo dpkg -i zyntratek-remote-manager_1.0.0_amd64.deb
+sudo apt-get install -f
+
+# 2. Ejecutar desde cualquier terminal
+zyntratek-remote-manager
+```
 
 ### Requisitos para Desarrolladores:
 * Node.js v20+
 * Rust Stable (v1.75+)
 * Tauri CLI v2 (`npm install -g @tauri-apps/cli@latest`)
 
-### Compilación para Desarrollo:
+### Compilación y Ejecución desde Código Fuente en Linux:
 ```bash
-# Instalar dependencias del frontend
+# 1. Instalar librerías de sistema en Linux (Ubuntu/Debian)
+sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev patchelf freerdp2-dev
+
+# 2. Clonar e instalar dependencias
+git clone https://github.com/Danvb15/zyntratek-remote-manager.git
+cd zyntratek-remote-manager
 npm install
 
-# Iniciar servidor de desarrollo Tauri + Vite
+# 3. Lanzar aplicación en modo desarrollo desde terminal
 npm run tauri dev
 ```
 
-### Compilación para Producción:
-```bash
-# Compilar paquete binario de producción
-npm run tauri build
-```
 
 ---
 
