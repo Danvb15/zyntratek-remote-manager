@@ -20,9 +20,10 @@ CREATE TABLE IF NOT EXISTS credentials (
 CREATE TABLE IF NOT EXISTS connections (
     id TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
-    protocol TEXT NOT NULL CHECK(protocol IN ('SSH', 'RDP')),
+    protocol TEXT NOT NULL,
     host TEXT NOT NULL,
     port INTEGER NOT NULL,
+
     username TEXT NOT NULL,
     credential_id TEXT REFERENCES credentials(id) ON DELETE SET NULL,
     folder_id TEXT REFERENCES folders(id) ON DELETE SET NULL,

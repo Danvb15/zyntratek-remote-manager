@@ -87,6 +87,17 @@ export const Topbar: React.FC<TopbarProps> = ({
           >
             RDP
           </button>
+          <button
+            onClick={() => onProtocolFilterChange("WEB")}
+            className={`px-3 py-1 rounded-lg transition-colors ${
+              protocolFilter === "WEB" ? "bg-purple-500/20 text-purple-300 font-semibold" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            WEB
+          </button>
+
+
+
         </div>
 
         {/* Help / Guía Button */}

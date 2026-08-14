@@ -19,12 +19,12 @@ import { CreateTagModal } from "@/components/tags/CreateTagModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 import { SshTerminalComponent } from "@/components/terminal/SshTerminalComponent";
+import { WebConsoleComponent } from "@/components/console/WebConsoleComponent";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { Connection, CreateConnectionPayload, UpdateConnectionPayload } from "@/types/connection";
 import { CredentialMetadata, CreateCredentialPayload, UpdateCredentialPayload } from "@/types/credential";
 import { Plus, Filter, X } from "lucide-react";
-
 
 export function App() {
   const [currentView, setCurrentView] = useState<"CONNECTIONS" | "CREDENTIALS" | "SETTINGS">("CONNECTIONS");
@@ -34,8 +34,11 @@ export function App() {
     return localStorage.getItem("zyntratek_onboarding_seen") !== "true";
   });
 
-  // Active Terminal Session
+  // Active Sessions
   const [activeSshConnection, setActiveSshConnection] = useState<Connection | null>(null);
+  const [activeWebConnection, setActiveWebConnection] = useState<Connection | null>(null);
+
+
 
 
   // Custom Hooks
@@ -105,10 +108,15 @@ export function App() {
   const handleConnect = (conn: Connection) => {
     if (conn.protocol === "SSH") {
       setActiveSshConnection(conn);
+    } else if (conn.protocol === "WEB") {
+      setActiveWebConnection(conn);
     } else {
       setNoticeConnection(conn);
     }
   };
+
+
+
 
   // Connection Actions Handlers
   const handleOpenCreateConnection = () => {
@@ -209,6 +217,21 @@ export function App() {
       </div>
     );
   }
+
+  // Render Active Web Console View if a WEB session is active
+  if (activeWebConnection) {
+    return (
+      <div className="h-screen w-screen p-3 bg-background">
+        <WebConsoleComponent
+          connection={activeWebConnection}
+          onBack={() => setActiveWebConnection(null)}
+        />
+      </div>
+    );
+  }
+
+
+
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground select-none font-sans antialiased">

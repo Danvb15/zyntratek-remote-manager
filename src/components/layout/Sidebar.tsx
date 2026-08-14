@@ -7,6 +7,7 @@ import {
   Shield,
   Terminal,
   Monitor,
+  Globe,
   Star,
   FolderPlus,
   Folder as FolderIcon,
@@ -16,6 +17,7 @@ import {
   Sliders,
   Layers,
 } from "lucide-react";
+
 
 interface SidebarProps {
   currentView: "CONNECTIONS" | "CREDENTIALS" | "SETTINGS";
@@ -61,7 +63,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const favoritesCount = connections.filter((c) => c.favorite).length;
   const sshCount = connections.filter((c) => c.protocol === "SSH").length;
   const rdpCount = connections.filter((c) => c.protocol === "RDP").length;
+  const webCount = connections.filter((c) => c.protocol === "WEB").length;
   const vaultCount = credentials.length;
+
+
+
 
   return (
     <aside className="w-64 border-r border-border bg-card flex flex-col h-full select-none">
@@ -181,6 +187,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {rdpCount}
             </span>
           </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("WEB");
+              onSelectFavoriteFilter("ALL");
+              onSelectFolder(null);
+              onSelectTag(null);
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+              currentView === "CONNECTIONS" && protocolFilter === "WEB" && favoriteFilter === "ALL"
+                ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Globe className="h-4 w-4 text-purple-400" />
+              <span>Consolas WEB</span>
+            </div>
+            <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-secondary/80 text-foreground font-mono">
+              {webCount}
+            </span>
+          </button>
+
+
+
         </div>
 
         {/* Folders Category */}

@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub enum Protocol {
     SSH,
     RDP,
+    WEB,
 }
 
 impl std::str::FromStr for Protocol {
@@ -13,6 +14,7 @@ impl std::str::FromStr for Protocol {
         match s {
             "SSH" => Ok(Protocol::SSH),
             "RDP" => Ok(Protocol::RDP),
+            "WEB" => Ok(Protocol::WEB),
             _ => Err(format!("Unknown protocol: {}", s)),
         }
     }
@@ -23,9 +25,13 @@ impl Protocol {
         match self {
             Protocol::SSH => "SSH",
             Protocol::RDP => "RDP",
+            Protocol::WEB => "WEB",
         }
     }
 }
+
+
+
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum CredentialType {

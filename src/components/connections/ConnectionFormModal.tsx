@@ -88,21 +88,17 @@ export const ConnectionFormModal: React.FC<ConnectionFormModalProps> = ({
       setError("El host o dirección IP es obligatorio.");
       return;
     }
-    if (!username.trim()) {
+    if (protocol !== "WEB" && !username.trim()) {
       setError("El nombre de usuario es obligatorio.");
       return;
     }
 
-    const defaultPort = protocol === "SSH" ? 22 : 3389;
-    let finalPort = defaultPort;
+    const defaultPort = protocol === "SSH" ? 22 : protocol === "RDP" ? 3389 : 443;
+    const finalPort = portInput.trim() !== "" ? parseInt(portInput.trim(), 10) : defaultPort;
 
-    if (portInput.trim() !== "") {
-      const parsedPort = parseInt(portInput.trim(), 10);
-      if (isNaN(parsedPort) || parsedPort <= 0 || parsedPort > 65535) {
-        setError("El puerto debe ser un número entero entre 1 y 65535.");
-        return;
-      }
-      finalPort = parsedPort;
+    if (isNaN(finalPort) || finalPort <= 0 || finalPort > 65535) {
+      setError("El puerto debe ser un número válido entre 1 y 65535.");
+      return;
     }
 
     setSubmitting(true);
@@ -153,6 +149,10 @@ export const ConnectionFormModal: React.FC<ConnectionFormModalProps> = ({
             >
               <option value="SSH">SSH (Secure Shell)</option>
               <option value="RDP">RDP (Remote Desktop)</option>
+              <option value="WEB">WEB Console (HTTP/HTTPS - Proxmox, pfSense, Portainer)</option>
+
+
+
             </select>
           </div>
 

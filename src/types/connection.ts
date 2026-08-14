@@ -1,4 +1,7 @@
-export type Protocol = 'SSH' | 'RDP';
+export type Protocol = 'SSH' | 'RDP' | 'WEB';
+
+
+
 
 export interface Tag {
   id: string;
