@@ -55,25 +55,38 @@ Descarga el instalador directamente desde la página oficial de [Releases en Git
 * 🐧 **Linux AppImage**: `zyntratek-remote-manager_1.0.0_amd64.AppImage`
 * 🐧 **Linux DEB**: `zyntratek-remote-manager_1.0.0_amd64.deb`
 
-### 🐧 Ejecución en Linux desde la Terminal:
+### 🐧 Cómo Ejecutar en Linux desde la Terminal (Versión Empaquetada de Producción):
 
-#### Opción A: Paquete Portable AppImage (Ubuntu, Fedora, Arch, Manjaro)
+#### 1️⃣ Opción A: Ejecutar el binario de producción local (Sin modo desarrollo)
+Si acabas de compilar la app con `npm run tauri build`, puedes ejecutar directamente el binario compilado de producción en Linux desde la terminal sin necesidad de servidores de desarrollo:
 ```bash
-# 1. Dar permisos de ejecución al archivo AppImage
-chmod +x zyntratek-remote-manager_1.0.0_amd64.AppImage
+# Navegar a la carpeta del binario empaquetado de producción
+cd src-tauri/target/release/
 
-# 2. Iniciar directamente desde la terminal
-./zyntratek-remote-manager_1.0.0_amd64.AppImage
+# Asignar permisos de ejecución
+chmod +x zyntratek-remote-manager
+
+# Lanzar la aplicación en producción directamente
+./zyntratek-remote-manager
 ```
 
-#### Opción B: Instalación de Paquete `.deb` (Debian, Ubuntu, Linux Mint)
+#### 2️⃣ Opción B: Ejecutar mediante el Instalador `.deb` (Debian, Ubuntu, Linux Mint)
 ```bash
-# 1. Instalar el paquete .deb mediante terminal
+# 1. Instalar el paquete de producción .deb descargado desde la terminal
 sudo dpkg -i zyntratek-remote-manager_1.0.0_amd64.deb
 sudo apt-get install -f
 
-# 2. Ejecutar desde cualquier terminal
+# 2. Abrir la aplicación desde cualquier terminal sin necesidad de npm
 zyntratek-remote-manager
+```
+
+#### 3️⃣ Opción C: Paquete Portable AppImage (Ubuntu, Fedora, Arch, Manjaro)
+```bash
+# 1. Asignar permisos de ejecución al ejecutable AppImage
+chmod +x zyntratek-remote-manager_1.0.0_amd64.AppImage
+
+# 2. Iniciar el ejecutable de producción directamente desde la terminal
+./zyntratek-remote-manager_1.0.0_amd64.AppImage
 ```
 
 ### Requisitos para Desarrolladores:
@@ -81,7 +94,7 @@ zyntratek-remote-manager
 * Rust Stable (v1.75+)
 * Tauri CLI v2 (`npm install -g @tauri-apps/cli@latest`)
 
-### Compilación y Ejecución desde Código Fuente en Linux:
+### Compilación desde Código Fuente en Linux:
 ```bash
 # 1. Instalar librerías de sistema en Linux (Ubuntu/Debian)
 sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev patchelf freerdp2-dev
@@ -91,9 +104,10 @@ git clone https://github.com/Danvb15/zyntratek-remote-manager.git
 cd zyntratek-remote-manager
 npm install
 
-# 3. Lanzar aplicación en modo desarrollo desde terminal
-npm run tauri dev
+# 3. Compilar los paquetes de producción (.deb / AppImage)
+npm run tauri build
 ```
+
 
 
 ---
