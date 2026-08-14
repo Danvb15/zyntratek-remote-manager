@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Search, Plus, RefreshCw } from "lucide-react";
+import { Search, Plus, RefreshCw, HelpCircle } from "lucide-react";
 import { Protocol } from "@/types/connection";
 
 interface TopbarProps {
@@ -9,6 +9,7 @@ interface TopbarProps {
   onProtocolFilterChange: (p: Protocol | "ALL") => void;
   onOpenCreateConnectionModal: () => void;
   onRefresh: () => void;
+  onOpenOnboarding?: () => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
@@ -19,8 +20,10 @@ export const Topbar: React.FC<TopbarProps> = ({
   onProtocolFilterChange,
   onOpenCreateConnectionModal,
   onRefresh,
+  onOpenOnboarding,
   searchInputRef,
 }) => {
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl+K or Cmd+K -> Focus Search
@@ -86,6 +89,18 @@ export const Topbar: React.FC<TopbarProps> = ({
           </button>
         </div>
 
+        {/* Help / Guía Button */}
+        {onOpenOnboarding && (
+          <button
+            onClick={onOpenOnboarding}
+            className="p-2 border border-border bg-secondary text-muted-foreground hover:text-primary rounded-xl hover:bg-secondary/80 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+            title="Ver Guía de Inicio Rápido: Claves y Contraseñas"
+          >
+            <HelpCircle className="h-4 w-4 text-primary" />
+            <span className="hidden md:inline">Guía</span>
+          </button>
+        )}
+
         {/* Refresh Button */}
         <button
           onClick={onRefresh}
@@ -94,6 +109,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         >
           <RefreshCw className="h-4 w-4" />
         </button>
+
 
         {/* New Connection Button */}
         <button

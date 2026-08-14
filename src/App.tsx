@@ -19,16 +19,24 @@ import { CreateTagModal } from "@/components/tags/CreateTagModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 import { SshTerminalComponent } from "@/components/terminal/SshTerminalComponent";
+import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { Connection, CreateConnectionPayload, UpdateConnectionPayload } from "@/types/connection";
 import { CredentialMetadata, CreateCredentialPayload, UpdateCredentialPayload } from "@/types/credential";
 import { Plus, Filter, X } from "lucide-react";
 
+
 export function App() {
   const [currentView, setCurrentView] = useState<"CONNECTIONS" | "CREDENTIALS" | "SETTINGS">("CONNECTIONS");
 
+  // Onboarding Guide Modal State
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
+    return localStorage.getItem("zyntratek_onboarding_seen") !== "true";
+  });
+
   // Active Terminal Session
   const [activeSshConnection, setActiveSshConnection] = useState<Connection | null>(null);
+
 
   // Custom Hooks
   const {
@@ -238,8 +246,10 @@ export function App() {
             refreshConnections();
             refreshCredentials();
           }}
+          onOpenOnboarding={() => setIsOnboardingOpen(true)}
           searchInputRef={searchInputRef}
         />
+
 
         {/* View Content */}
         <main className="flex-1 p-6 overflow-y-auto">
@@ -459,7 +469,15 @@ export function App() {
           await createTag(name, color);
         }}
       />
+
+      {/* Onboarding Guide Modal */}
+      <OnboardingModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        onNavigateToVault={() => setCurrentView("CREDENTIALS")}
+      />
     </div>
   );
 }
+
 export default App;
