@@ -109,8 +109,9 @@ export const ConnectionFormModal: React.FC<ConnectionFormModalProps> = ({
         host: host.trim(),
         port: finalPort,
         username: username.trim(),
-        credentialId: credentialId || undefined,
-        folderId: folderId || undefined,
+        credentialId: credentialId ? credentialId : "",
+        folderId: folderId ? folderId : "",
+
         favorite,
         tagIds: selectedTagIds,
       };

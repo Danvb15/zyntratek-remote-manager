@@ -161,6 +161,8 @@ impl Repository {
 
         let now = Utc::now().to_rfc3339();
         let favorite = payload.favorite.unwrap_or(false);
+        let credential_id = Self::validate_credential_id(conn, payload.credential_id.clone());
+        let folder_id = Self::validate_folder_id(conn, payload.folder_id.clone());
 
         conn.execute(
             "INSERT INTO connections (id, name, protocol, host, port, username, credential_id, folder_id, favorite, created_at, updated_at)
@@ -172,8 +174,8 @@ impl Repository {
                 payload.host,
                 payload.port,
                 payload.username,
-                payload.credential_id,
-                payload.folder_id,
+                credential_id,
+                folder_id,
                 if favorite { 1 } else { 0 },
                 now,
                 now
@@ -190,6 +192,44 @@ impl Repository {
         }
 
         Self::get_connection(conn, &id)
+    }
+
+    fn validate_credential_id(conn: &SqliteConnection, id_opt: Option<String>) -> Option<String> {
+        let id = match id_opt {
+            Some(s) => s.trim().to_string(),
+            None => return None,
+        };
+        if id.is_empty() {
+            return None;
+        }
+        let mut stmt = match conn.prepare("SELECT 1 FROM credentials WHERE id = ?1") {
+            Ok(s) => s,
+            Err(_) => return None,
+        };
+        if stmt.exists(params![id]).unwrap_or(false) {
+            Some(id)
+        } else {
+            None
+        }
+    }
+
+    fn validate_folder_id(conn: &SqliteConnection, id_opt: Option<String>) -> Option<String> {
+        let id = match id_opt {
+            Some(s) => s.trim().to_string(),
+            None => return None,
+        };
+        if id.is_empty() {
+            return None;
+        }
+        let mut stmt = match conn.prepare("SELECT 1 FROM folders WHERE id = ?1") {
+            Ok(s) => s,
+            Err(_) => return None,
+        };
+        if stmt.exists(params![id]).unwrap_or(false) {
+            Some(id)
+        } else {
+            None
+        }
     }
 
     pub fn get_connection(conn: &SqliteConnection, id: &str) -> Result<ConnectionDto, AppError> {
@@ -250,8 +290,21 @@ impl Repository {
         let host = payload.host.clone().unwrap_or(current.host);
         let port = payload.port.unwrap_or(current.port);
         let username = payload.username.clone().unwrap_or(current.username);
-        let credential_id = payload.credential_id.clone().or(current.credential_id);
-        let folder_id = payload.folder_id.clone().or(current.folder_id);
+
+        let raw_cred_id = match &payload.credential_id {
+            Some(s) if s.trim().is_empty() => None,
+            Some(s) => Some(s.clone()),
+            None => current.credential_id,
+        };
+        let credential_id = Self::validate_credential_id(conn, raw_cred_id);
+
+        let raw_folder_id = match &payload.folder_id {
+            Some(s) if s.trim().is_empty() => None,
+            Some(s) => Some(s.clone()),
+            None => current.folder_id,
+        };
+        let folder_id = Self::validate_folder_id(conn, raw_folder_id);
+
         let favorite = payload.favorite.unwrap_or(current.favorite);
 
         conn.execute(
@@ -270,6 +323,7 @@ impl Repository {
                 id
             ],
         )?;
+
 
         if let Some(tag_ids) = &payload.tag_ids {
             conn.execute("DELETE FROM connection_tags WHERE connection_id = ?1", params![id])?;
