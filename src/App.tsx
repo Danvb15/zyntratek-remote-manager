@@ -109,10 +109,13 @@ export function App() {
       setActiveSshConnection(conn);
     } else if (conn.protocol === "WEB") {
       setActiveWebConnection(conn);
+    } else if (conn.protocol === "VNC") {
+      setActiveVncConnection(conn);
     } else {
       setNoticeConnection(conn);
     }
   };
+
 
 
 
