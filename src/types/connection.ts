@@ -1,4 +1,5 @@
-export type Protocol = 'SSH' | 'RDP' | 'WEB';
+export type Protocol = 'SSH' | 'RDP' | 'WEB' | 'VNC';
+
 
 
 

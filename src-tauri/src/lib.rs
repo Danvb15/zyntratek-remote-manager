@@ -60,7 +60,9 @@ pub fn run() {
             commands::rdp_cmd::list_rdp_sessions,
             commands::rdp_cmd::disconnect_rdp_session,
             commands::web_cmd::open_web_console_window,
+            commands::vnc_cmd::start_vnc_session,
         ])
+
 
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

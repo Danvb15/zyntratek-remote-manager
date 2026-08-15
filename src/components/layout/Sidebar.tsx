@@ -8,6 +8,7 @@ import {
   Terminal,
   Monitor,
   Globe,
+  Tv,
   Star,
   FolderPlus,
   Folder as FolderIcon,
@@ -17,6 +18,7 @@ import {
   Sliders,
   Layers,
 } from "lucide-react";
+
 
 
 interface SidebarProps {
@@ -64,7 +66,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sshCount = connections.filter((c) => c.protocol === "SSH").length;
   const rdpCount = connections.filter((c) => c.protocol === "RDP").length;
   const webCount = connections.filter((c) => c.protocol === "WEB").length;
+  const vncCount = connections.filter((c) => c.protocol === "VNC").length;
   const vaultCount = credentials.length;
+
 
 
 
@@ -211,6 +215,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
           </button>
 
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("VNC");
+              onSelectFavoriteFilter("ALL");
+              onSelectFolder(null);
+              onSelectTag(null);
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+              currentView === "CONNECTIONS" && protocolFilter === "VNC" && favoriteFilter === "ALL"
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Tv className="h-4 w-4 text-amber-400" />
+              <span>Sesiones VNC</span>
+            </div>
+            <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-secondary/80 text-foreground font-mono">
+              {vncCount}
+            </span>
+          </button>
 
 
         </div>

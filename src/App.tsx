@@ -20,6 +20,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 import { SshTerminalComponent } from "@/components/terminal/SshTerminalComponent";
 import { WebConsoleComponent } from "@/components/console/WebConsoleComponent";
+import { VncViewerComponent } from "@/components/vnc/VncViewerComponent";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { Connection, CreateConnectionPayload, UpdateConnectionPayload } from "@/types/connection";
@@ -37,9 +38,7 @@ export function App() {
   // Active Sessions
   const [activeSshConnection, setActiveSshConnection] = useState<Connection | null>(null);
   const [activeWebConnection, setActiveWebConnection] = useState<Connection | null>(null);
-
-
-
+  const [activeVncConnection, setActiveVncConnection] = useState<Connection | null>(null);
 
   // Custom Hooks
   const {
@@ -229,6 +228,19 @@ export function App() {
       </div>
     );
   }
+
+  // Render Active VNC View if a VNC session is active
+  if (activeVncConnection) {
+    return (
+      <div className="h-screen w-screen p-3 bg-background">
+        <VncViewerComponent
+          connection={activeVncConnection}
+          onClose={() => setActiveVncConnection(null)}
+        />
+      </div>
+    );
+  }
+
 
 
 

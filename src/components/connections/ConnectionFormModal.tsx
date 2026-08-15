@@ -93,7 +93,7 @@ export const ConnectionFormModal: React.FC<ConnectionFormModalProps> = ({
       return;
     }
 
-    const defaultPort = protocol === "SSH" ? 22 : protocol === "RDP" ? 3389 : 443;
+    const defaultPort = protocol === "SSH" ? 22 : protocol === "RDP" ? 3389 : protocol === "VNC" ? 5900 : 443;
     const finalPort = portInput.trim() !== "" ? parseInt(portInput.trim(), 10) : defaultPort;
 
     if (isNaN(finalPort) || finalPort <= 0 || finalPort > 65535) {
@@ -151,11 +151,10 @@ export const ConnectionFormModal: React.FC<ConnectionFormModalProps> = ({
               <option value="SSH">SSH (Secure Shell)</option>
               <option value="RDP">RDP (Remote Desktop)</option>
               <option value="WEB">WEB Console (HTTP/HTTPS - Proxmox, pfSense, Portainer)</option>
-
-
-
+              <option value="VNC">VNC (Virtual Network Computing - Linux, macOS, Windows)</option>
             </select>
           </div>
+
 
           {/* Name */}
           <div className="space-y-1">

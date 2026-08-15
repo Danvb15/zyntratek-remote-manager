@@ -95,7 +95,14 @@ export const Topbar: React.FC<TopbarProps> = ({
           >
             WEB
           </button>
-
+          <button
+            onClick={() => onProtocolFilterChange("VNC")}
+            className={`px-3 py-1 rounded-lg transition-colors ${
+              protocolFilter === "VNC" ? "bg-amber-500/20 text-amber-300 font-semibold" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            VNC
+          </button>
 
 
         </div>

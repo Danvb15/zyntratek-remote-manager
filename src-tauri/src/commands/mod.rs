@@ -4,7 +4,9 @@ pub mod folder_cmd;
 pub mod rdp_cmd;
 pub mod ssh_cmd;
 pub mod tag_cmd;
+pub mod vnc_cmd;
 pub mod web_cmd;
+
 
 
 use crate::error::AppError;
