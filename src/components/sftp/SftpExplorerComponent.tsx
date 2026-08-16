@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import {
   FolderTree,
   Folder,
@@ -13,8 +14,10 @@ import {
   ArrowLeft,
   ChevronRight,
   HardDrive,
+  Lock,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
-
 import { Connection } from "../../types/connection";
 
 interface SftpItem {
@@ -30,24 +33,58 @@ interface SftpExplorerComponentProps {
   onBack: () => void;
 }
 
-const INITIAL_FILES: SftpItem[] = [
-  { name: "..", isDir: true, size: 0, permissions: "drwxr-xr-x", modified: "2026-08-16 10:00" },
-  { name: "etc", isDir: true, size: 4096, permissions: "drwxr-xr-x", modified: "2026-08-16 09:30" },
-  { name: "var", isDir: true, size: 4096, permissions: "drwxr-xr-x", modified: "2026-08-16 08:45" },
-  { name: "www", isDir: true, size: 4096, permissions: "drwxr-xr-x", modified: "2026-08-16 11:20" },
-  { name: "config.nginx", isDir: false, size: 1842, permissions: "-rw-r--r--", modified: "2026-08-15 16:10" },
-  { name: "app.log", isDir: false, size: 248910, permissions: "-rw-r--r--", modified: "2026-08-16 12:15" },
-  { name: "docker-compose.yml", isDir: false, size: 754, permissions: "-rw-r--r--", modified: "2026-08-14 18:00" },
-];
-
 export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
   connection,
   onBack,
 }) => {
-  const [currentPath, setCurrentPath] = useState<string>("/var/www/html");
-  const [files, setFiles] = useState<SftpItem[]>(INITIAL_FILES);
+  const [currentPath, setCurrentPath] = useState<string>(".");
+  const [files, setFiles] = useState<SftpItem[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [errorNotice, setErrorNotice] = useState<string | null>(null);
   const [statusNotice, setStatusNotice] = useState<string | null>(null);
+
+  // Hidden File Input Ref for Uploading Local File
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+
+  // Prompt de contraseña manual si la bóveda no la tiene
+  const [manualPasswordPrompt, setManualPasswordPrompt] = useState<boolean>(false);
+  const [manualPassword, setManualPassword] = useState<string>("");
+
+  const loadDirectory = useCallback(
+    async (path: string, pass?: string) => {
+      setLoading(true);
+      setErrorNotice(null);
+      try {
+        const result = await invoke<SftpItem[]>("list_sftp_dir", {
+          connectionId: connection.id,
+          path: path,
+          manualPassword: pass || (manualPassword ? manualPassword : null),
+        });
+        setFiles(result);
+        setManualPasswordPrompt(false);
+      } catch (err: unknown) {
+        const msg = (err as Error)?.message || String(err);
+        if (
+          msg.includes("VaultError") ||
+          msg.includes("Credencial no encontrada") ||
+          msg.includes("Se requiere contraseña") ||
+          msg.includes("Autenticación SFTP no completada")
+        ) {
+          setManualPasswordPrompt(true);
+        } else {
+          setErrorNotice(`Error al leer directorio remoto: ${msg}`);
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [connection.id, manualPassword]
+  );
+
+  useEffect(() => {
+    loadDirectory(currentPath);
+  }, [currentPath, loadDirectory]);
 
   const formatSize = (bytes: number, isDir: boolean) => {
     if (isDir) return "--";
@@ -60,7 +97,13 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
     if (item.isDir) {
       return <Folder className="w-4 h-4 text-amber-400 fill-amber-400/20" />;
     }
-    if (item.name.endsWith(".yml") || item.name.endsWith(".nginx") || item.name.endsWith(".json")) {
+    if (
+      item.name.endsWith(".yml") ||
+      item.name.endsWith(".nginx") ||
+      item.name.endsWith(".json") ||
+      item.name.endsWith(".ts") ||
+      item.name.endsWith(".rs")
+    ) {
       return <FileCode className="w-4 h-4 text-emerald-400" />;
     }
     if (item.name.endsWith(".log") || item.name.endsWith(".txt")) {
@@ -74,59 +117,160 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
     if (item.name === "..") {
       const parts = currentPath.split("/").filter(Boolean);
       parts.pop();
-      setCurrentPath("/" + parts.join("/"));
+      const newPath = parts.length === 0 ? "." : "/" + parts.join("/");
+      setCurrentPath(newPath);
     } else {
-      setCurrentPath(currentPath === "/" ? `/${item.name}` : `${currentPath}/${item.name}`);
+      const newPath =
+        currentPath === "." || currentPath === "/"
+          ? `/${item.name}`
+          : `${currentPath}/${item.name}`;
+      setCurrentPath(newPath);
     }
     setSelectedFile(null);
   };
 
-  const handleUpload = () => {
-    setStatusNotice("Seleccione un archivo local para subir al servidor remoto...");
-    setTimeout(() => setStatusNotice(null), 3500);
-  };
-
-  const handleDownload = () => {
-    if (!selectedFile) {
-      setStatusNotice("Por favor seleccione un archivo para descargar.");
-      setTimeout(() => setStatusNotice(null), 3000);
-      return;
-    }
-    setStatusNotice(`Descargando ${selectedFile} a su equipo local...`);
-    setTimeout(() => setStatusNotice(null), 3500);
-  };
-
-  const handleMkdir = () => {
-    const folderName = prompt("Nombre de la nueva carpeta remota:");
-    if (folderName && folderName.trim()) {
-      const newItem: SftpItem = {
-        name: folderName.trim(),
-        isDir: true,
-        size: 4096,
-        permissions: "drwxr-xr-x",
-        modified: new Date().toISOString().slice(0, 16).replace("T", " "),
-      };
-      setFiles((prev) => [...prev, newItem]);
-      setStatusNotice(`Carpeta '${folderName.trim()}' creada en ${currentPath}`);
-      setTimeout(() => setStatusNotice(null), 3000);
+  const handleTriggerUpload = () => {
+    if (uploadInputRef.current) {
+      uploadInputRef.current.value = "";
+      uploadInputRef.current.click();
     }
   };
 
-  const handleDelete = () => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+
+    const file = fileList[0];
+    const fileName = file.name;
+    // Extraer ruta local si es proporcionada por Electron/Tauri File
+    const localFilePath = (file as unknown as { path?: string }).path || fileName;
+
+    const remoteTarget =
+      currentPath === "." || currentPath === "/"
+        ? `/${fileName}`
+        : `${currentPath}/${fileName}`;
+
+    try {
+      setStatusNotice(`Subiendo ${fileName} al servidor remoto...`);
+      await invoke("upload_sftp_file", {
+        connectionId: connection.id,
+        remotePath: remoteTarget,
+        localFilePath: localFilePath,
+        manualPassword: manualPassword || null,
+      });
+
+      setStatusNotice(`¡Archivo ${fileName} subido exitosamente!`);
+      setTimeout(() => setStatusNotice(null), 3000);
+      loadDirectory(currentPath);
+    } catch (err: unknown) {
+      setErrorNotice(`Falló la subida de archivo: ${(err as Error).message || String(err)}`);
+    }
+  };
+
+  const handleDownload = async () => {
     if (!selectedFile) return;
-    if (confirm(`¿Eliminar '${selectedFile}' en el servidor remoto?`)) {
-      setFiles((prev) => prev.filter((f) => f.name !== selectedFile));
-      setSelectedFile(null);
-      setStatusNotice(`Archivo/Carpeta eliminada correctamente.`);
-      setTimeout(() => setStatusNotice(null), 3000);
+
+    const localDest = prompt(
+      "Ingrese la ruta de destino local para guardar el archivo:",
+      `C:\\Users\\Public\\Downloads\\${selectedFile}`
+    );
+
+    if (!localDest || !localDest.trim()) return;
+
+    const remoteFile =
+      currentPath === "." || currentPath === "/"
+        ? `/${selectedFile}`
+        : `${currentPath}/${selectedFile}`;
+
+    try {
+      setStatusNotice(`Descargando ${selectedFile}...`);
+      await invoke("download_sftp_file", {
+        connectionId: connection.id,
+        remoteFilePath: remoteFile,
+        localDestinationPath: localDest.trim(),
+        manualPassword: manualPassword || null,
+      });
+
+      setStatusNotice(`¡Archivo ${selectedFile} guardado en ${localDest.trim()}!`);
+      setTimeout(() => setStatusNotice(null), 3500);
+    } catch (err: unknown) {
+      setErrorNotice(`Falló la descarga de archivo: ${(err as Error).message || String(err)}`);
     }
   };
 
-  const pathParts = currentPath.split("/").filter(Boolean);
+  const handleMkdir = async () => {
+    const folderName = prompt("Nombre de la nueva carpeta remota:");
+    if (!folderName || !folderName.trim()) return;
+
+    const targetFolderPath =
+      currentPath === "." || currentPath === "/"
+        ? `/${folderName.trim()}`
+        : `${currentPath}/${folderName.trim()}`;
+
+    try {
+      setStatusNotice(`Creando carpeta ${folderName}...`);
+      await invoke("create_sftp_dir", {
+        connectionId: connection.id,
+        path: targetFolderPath,
+        manualPassword: manualPassword || null,
+      });
+      setStatusNotice(`Carpeta '${folderName.trim()}' creada.`);
+      setTimeout(() => setStatusNotice(null), 3000);
+      loadDirectory(currentPath);
+    } catch (err: unknown) {
+      setErrorNotice(`Error al crear carpeta: ${(err as Error).message || String(err)}`);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedFile || selectedFile === "..") return;
+    const targetItem = files.find((f) => f.name === selectedFile);
+    if (!targetItem) return;
+
+    if (confirm(`¿Está seguro de eliminar '${selectedFile}' en el servidor remoto?`)) {
+      const fullPath =
+        currentPath === "." || currentPath === "/"
+          ? `/${selectedFile}`
+          : `${currentPath}/${selectedFile}`;
+
+      try {
+        setStatusNotice(`Eliminando ${selectedFile}...`);
+        await invoke("delete_sftp_item", {
+          connectionId: connection.id,
+          path: fullPath,
+          isDir: targetItem.isDir,
+          manualPassword: manualPassword || null,
+        });
+        setSelectedFile(null);
+        setStatusNotice(`Elemento eliminado correctamente.`);
+        setTimeout(() => setStatusNotice(null), 3000);
+        loadDirectory(currentPath);
+      } catch (err: unknown) {
+        setErrorNotice(`Error al eliminar elemento: ${(err as Error).message || String(err)}`);
+      }
+    }
+  };
+
+  const handleManualPasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (manualPassword.trim()) {
+      loadDirectory(currentPath, manualPassword.trim());
+    }
+  };
+
+  const pathParts = currentPath.split("/").filter((p) => p && p !== ".");
 
   return (
     <div className="flex flex-col h-full bg-[#0A1120] text-slate-100 font-sans rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
-      {/* Top Header */}
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={uploadInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {/* Top Header Bar */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#0F172A] border-b border-slate-800 select-none">
         <div className="flex items-center space-x-3">
           <button
@@ -143,7 +287,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
             <div className="flex items-center space-x-2">
               <span className="font-semibold text-sm text-slate-100">{connection.name}</span>
               <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-medium">
-                SFTP Explorer
+                SFTP Real Engine
               </span>
             </div>
             <p className="text-[11px] text-slate-400 font-mono">
@@ -155,8 +299,9 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
         {/* Action Controls Toolbar */}
         <div className="flex items-center space-x-2">
           <button
-            onClick={handleUpload}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-medium transition-colors"
+            onClick={handleTriggerUpload}
+            disabled={loading || manualPasswordPrompt}
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
           >
             <Upload className="w-3.5 h-3.5" />
             <span>Subir Archivo</span>
@@ -164,9 +309,9 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
 
           <button
             onClick={handleDownload}
-            disabled={!selectedFile}
+            disabled={!selectedFile || loading || manualPasswordPrompt}
             className={`flex items-center space-x-1.5 px-3 py-1.5 border rounded-lg text-xs font-medium transition-colors ${
-              selectedFile
+              selectedFile && !loading && !manualPasswordPrompt
                 ? "bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border-sky-500/30"
                 : "bg-slate-800/40 text-slate-500 border-slate-700/30 cursor-not-allowed"
             }`}
@@ -177,7 +322,8 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
 
           <button
             onClick={handleMkdir}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-medium transition-colors"
+            disabled={loading || manualPasswordPrompt}
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
           >
             <FolderPlus className="w-3.5 h-3.5 text-amber-400" />
             <span>Nueva Carpeta</span>
@@ -185,9 +331,9 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
 
           <button
             onClick={handleDelete}
-            disabled={!selectedFile || selectedFile === ".."}
+            disabled={!selectedFile || selectedFile === ".." || loading || manualPasswordPrompt}
             className={`p-1.5 border rounded-lg transition-colors ${
-              selectedFile && selectedFile !== ".."
+              selectedFile && selectedFile !== ".." && !loading && !manualPasswordPrompt
                 ? "bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border-rose-500/30"
                 : "bg-slate-800/40 text-slate-600 border-slate-700/30 cursor-not-allowed"
             }`}
@@ -197,11 +343,12 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
           </button>
 
           <button
-            onClick={() => setFiles([...INITIAL_FILES])}
-            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors"
+            onClick={() => loadDirectory(currentPath)}
+            disabled={loading}
+            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors disabled:opacity-50"
             title="Refrescar directorio"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
         </div>
       </div>
@@ -228,15 +375,71 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
         ))}
       </div>
 
-      {/* Notification Status Banner */}
+      {/* Manual Password Prompt Modal Overlay */}
+      {manualPasswordPrompt && (
+        <div className="p-4 bg-amber-500/10 border-b border-amber-500/30 flex items-center justify-between select-none">
+          <div className="flex items-center space-x-3">
+            <Lock className="w-5 h-5 text-amber-400" />
+            <div>
+              <p className="text-xs font-semibold text-amber-200">Autenticación Requerida</p>
+              <p className="text-[11px] text-amber-300/80">
+                Ingrese la contraseña SSH/SFTP para {connection.username}@{connection.host}
+              </p>
+            </div>
+          </div>
+          <form onSubmit={handleManualPasswordSubmit} className="flex items-center space-x-2">
+            <input
+              type="password"
+              placeholder="Contraseña del servidor..."
+              value={manualPassword}
+              onChange={(e) => setManualPassword(e.target.value)}
+              className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+              autoFocus
+            />
+            <button
+              type="submit"
+              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-medium transition-colors"
+            >
+              Conectar
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Status Notice */}
       {statusNotice && (
         <div className="bg-cyan-500/10 border-b border-cyan-500/20 px-4 py-1.5 text-xs text-cyan-300 animate-fadeIn">
           {statusNotice}
         </div>
       )}
 
+      {/* Error Notice */}
+      {errorNotice && (
+        <div className="bg-rose-500/10 border-b border-rose-500/20 px-4 py-2 text-xs text-rose-300 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{errorNotice}</span>
+          </div>
+          <button
+            onClick={() => setErrorNotice(null)}
+            className="text-rose-400 hover:text-white text-xs font-bold"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Main Remote File Table */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto relative">
+        {loading && (
+          <div className="absolute inset-0 bg-[#0A1120]/70 backdrop-blur-xs flex items-center justify-center z-10">
+            <div className="flex items-center space-x-2 text-cyan-400 text-xs font-medium">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Conectando y leyendo servidor remoto...</span>
+            </div>
+          </div>
+        )}
+
         <table className="w-full text-left border-collapse text-xs select-none">
           <thead>
             <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono text-[11px] uppercase tracking-wider">
@@ -247,31 +450,39 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50 font-mono">
-            {files.map((file) => {
-              const isSelected = selectedFile === file.name;
-              return (
-                <tr
-                  key={file.name}
-                  onClick={() => setSelectedFile(file.name)}
-                  onDoubleClick={() => handleOpenFolder(file)}
-                  className={`cursor-pointer transition-colors ${
-                    isSelected
-                      ? "bg-cyan-500/15 text-cyan-200"
-                      : "hover:bg-slate-800/40 text-slate-200"
-                  }`}
-                >
-                  <td className="py-2 px-4 flex items-center space-x-2.5">
-                    {getFileIcon(file)}
-                    <span className={file.isDir ? "font-semibold text-slate-100" : "text-slate-300"}>
-                      {file.name}
-                    </span>
-                  </td>
-                  <td className="py-2 px-4 text-slate-400">{formatSize(file.size, file.isDir)}</td>
-                  <td className="py-2 px-4 text-slate-500 text-[11px]">{file.permissions}</td>
-                  <td className="py-2 px-4 text-slate-400 text-[11px]">{file.modified}</td>
-                </tr>
-              );
-            })}
+            {files.length === 0 && !loading ? (
+              <tr>
+                <td colSpan={4} className="py-8 text-center text-slate-500 italic">
+                  Directorio vacío o sin elementos disponibles.
+                </td>
+              </tr>
+            ) : (
+              files.map((file) => {
+                const isSelected = selectedFile === file.name;
+                return (
+                  <tr
+                    key={file.name}
+                    onClick={() => setSelectedFile(file.name)}
+                    onDoubleClick={() => handleOpenFolder(file)}
+                    className={`cursor-pointer transition-colors ${
+                      isSelected
+                        ? "bg-cyan-500/15 text-cyan-200"
+                        : "hover:bg-slate-800/40 text-slate-200"
+                    }`}
+                  >
+                    <td className="py-2 px-4 flex items-center space-x-2.5">
+                      {getFileIcon(file)}
+                      <span className={file.isDir ? "font-semibold text-slate-100" : "text-slate-300"}>
+                        {file.name}
+                      </span>
+                    </td>
+                    <td className="py-2 px-4 text-slate-400">{formatSize(file.size, file.isDir)}</td>
+                    <td className="py-2 px-4 text-slate-500 text-[11px]">{file.permissions}</td>
+                    <td className="py-2 px-4 text-slate-400 text-[11px]">{file.modified}</td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>

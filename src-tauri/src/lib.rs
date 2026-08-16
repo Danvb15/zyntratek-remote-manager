@@ -62,7 +62,12 @@ pub fn run() {
             commands::web_cmd::open_web_console_window,
             commands::vnc_cmd::start_vnc_session,
             commands::sftp_cmd::list_sftp_dir,
+            commands::sftp_cmd::create_sftp_dir,
+            commands::sftp_cmd::delete_sftp_item,
+            commands::sftp_cmd::upload_sftp_file,
+            commands::sftp_cmd::download_sftp_file,
         ])
+
 
 
 
