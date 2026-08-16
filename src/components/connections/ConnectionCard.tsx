@@ -1,7 +1,7 @@
 import React from "react";
 import { Connection } from "@/types/connection";
 import { Badge } from "@/components/ui/Badge";
-import { Terminal, Monitor, Globe, Tv, Star, Copy, Edit2, Trash2, Play } from "lucide-react";
+import { Terminal, Monitor, Globe, Tv, FolderTree, Star, Copy, Edit2, Trash2, Play } from "lucide-react";
 
 interface ConnectionCardProps {
   connection: Connection;
@@ -23,6 +23,7 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
   const isSSH = connection.protocol === "SSH";
   const isRDP = connection.protocol === "RDP";
   const isVNC = connection.protocol === "VNC";
+  const isSFTP = connection.protocol === "SFTP";
 
   return (
     <div className="group relative bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex flex-col justify-between">
@@ -37,6 +38,8 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
                 ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                 : isVNC
                 ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                : isSFTP
+                ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
                 : "bg-purple-500/10 text-purple-400 border-purple-500/20"
             }`}
           >
@@ -46,10 +49,13 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
               <Monitor className="h-5 w-5" />
             ) : isVNC ? (
               <Tv className="h-5 w-5" />
+            ) : isSFTP ? (
+              <FolderTree className="h-5 w-5" />
             ) : (
               <Globe className="h-5 w-5" />
             )}
           </div>
+
 
 
 

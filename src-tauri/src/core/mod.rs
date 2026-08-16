@@ -6,6 +6,7 @@ pub enum Protocol {
     RDP,
     WEB,
     VNC,
+    SFTP,
 }
 
 impl std::str::FromStr for Protocol {
@@ -17,6 +18,7 @@ impl std::str::FromStr for Protocol {
             "RDP" => Ok(Protocol::RDP),
             "WEB" => Ok(Protocol::WEB),
             "VNC" => Ok(Protocol::VNC),
+            "SFTP" => Ok(Protocol::SFTP),
             _ => Err(format!("Unknown protocol: {}", s)),
         }
     }
@@ -29,9 +31,11 @@ impl Protocol {
             Protocol::RDP => "RDP",
             Protocol::WEB => "WEB",
             Protocol::VNC => "VNC",
+            Protocol::SFTP => "SFTP",
         }
     }
 }
+
 
 
 

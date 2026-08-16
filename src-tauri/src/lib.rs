@@ -61,7 +61,9 @@ pub fn run() {
             commands::rdp_cmd::disconnect_rdp_session,
             commands::web_cmd::open_web_console_window,
             commands::vnc_cmd::start_vnc_session,
+            commands::sftp_cmd::list_sftp_dir,
         ])
+
 
 
         .run(tauri::generate_context!())

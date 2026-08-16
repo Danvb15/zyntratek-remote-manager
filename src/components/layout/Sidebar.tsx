@@ -9,6 +9,7 @@ import {
   Monitor,
   Globe,
   Tv,
+  FolderTree,
   Star,
   FolderPlus,
   Folder as FolderIcon,
@@ -18,6 +19,7 @@ import {
   Sliders,
   Layers,
 } from "lucide-react";
+
 
 
 
@@ -67,7 +69,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const rdpCount = connections.filter((c) => c.protocol === "RDP").length;
   const webCount = connections.filter((c) => c.protocol === "WEB").length;
   const vncCount = connections.filter((c) => c.protocol === "VNC").length;
+  const sftpCount = connections.filter((c) => c.protocol === "SFTP").length;
   const vaultCount = credentials.length;
+
 
 
 
@@ -237,6 +241,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {vncCount}
             </span>
           </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("SFTP");
+              onSelectFavoriteFilter("ALL");
+              onSelectFolder(null);
+              onSelectTag(null);
+            }}
+            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+              currentView === "CONNECTIONS" && protocolFilter === "SFTP" && favoriteFilter === "ALL"
+                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <FolderTree className="h-4 w-4 text-cyan-400" />
+              <span>Archivos SFTP</span>
+            </div>
+            <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-secondary/80 text-foreground font-mono">
+              {sftpCount}
+            </span>
+          </button>
+
+
 
 
         </div>

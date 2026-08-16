@@ -103,6 +103,15 @@ export const Topbar: React.FC<TopbarProps> = ({
           >
             VNC
           </button>
+          <button
+            onClick={() => onProtocolFilterChange("SFTP")}
+            className={`px-3 py-1 rounded-lg transition-colors ${
+              protocolFilter === "SFTP" ? "bg-cyan-500/20 text-cyan-300 font-semibold" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            SFTP
+          </button>
+
 
 
         </div>

@@ -21,6 +21,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SshTerminalComponent } from "@/components/terminal/SshTerminalComponent";
 import { WebConsoleComponent } from "@/components/console/WebConsoleComponent";
 import { VncViewerComponent } from "@/components/vnc/VncViewerComponent";
+import { SftpExplorerComponent } from "@/components/sftp/SftpExplorerComponent";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { Connection, CreateConnectionPayload, UpdateConnectionPayload } from "@/types/connection";
@@ -39,6 +40,8 @@ export function App() {
   const [activeSshConnection, setActiveSshConnection] = useState<Connection | null>(null);
   const [activeWebConnection, setActiveWebConnection] = useState<Connection | null>(null);
   const [activeVncConnection, setActiveVncConnection] = useState<Connection | null>(null);
+  const [activeSftpConnection, setActiveSftpConnection] = useState<Connection | null>(null);
+
 
   // Custom Hooks
   const {
@@ -111,10 +114,13 @@ export function App() {
       setActiveWebConnection(conn);
     } else if (conn.protocol === "VNC") {
       setActiveVncConnection(conn);
+    } else if (conn.protocol === "SFTP") {
+      setActiveSftpConnection(conn);
     } else {
       setNoticeConnection(conn);
     }
   };
+
 
 
 
@@ -243,6 +249,19 @@ export function App() {
       </div>
     );
   }
+
+  // Render Active SFTP Remote File Explorer View if an SFTP session is active
+  if (activeSftpConnection) {
+    return (
+      <div className="h-screen w-screen p-3 bg-background">
+        <SftpExplorerComponent
+          connection={activeSftpConnection}
+          onBack={() => setActiveSftpConnection(null)}
+        />
+      </div>
+    );
+  }
+
 
 
 
