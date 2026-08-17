@@ -63,15 +63,19 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
         });
         setFiles(result);
         setManualPasswordPrompt(false);
+        setErrorNotice(null);
       } catch (err: unknown) {
         const msg = (err as Error)?.message || String(err);
         if (
           msg.includes("VaultError") ||
           msg.includes("Credencial no encontrada") ||
           msg.includes("Se requiere contraseña") ||
-          msg.includes("Autenticación SFTP no completada")
+          msg.includes("Autenticación SFTP") ||
+          msg.includes("Authentication failed") ||
+          msg.includes("Session(-18)")
         ) {
           setManualPasswordPrompt(true);
+          setErrorNotice(null);
         } else {
           setErrorNotice(`Error al leer directorio remoto: ${msg}`);
         }
@@ -81,6 +85,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
     },
     [connection.id, manualPassword]
   );
+
 
   useEffect(() => {
     loadDirectory(currentPath);
