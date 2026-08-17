@@ -122,7 +122,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
     if (item.name === "..") {
       const parts = currentPath.split("/").filter(Boolean);
       parts.pop();
-      const newPath = parts.length === 0 ? "." : "/" + parts.join("/");
+      const newPath = parts.length === 0 ? "/" : "/" + parts.join("/");
       setCurrentPath(newPath);
     } else {
       const newPath =
@@ -133,6 +133,15 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
     }
     setSelectedFile(null);
   };
+
+  const handleOpenSelectedFolder = () => {
+    if (!selectedFile) return;
+    const targetItem = files.find((f) => f.name === selectedFile);
+    if (targetItem && targetItem.isDir) {
+      handleOpenFolder(targetItem);
+    }
+  };
+
 
   const handleTriggerUpload = () => {
     if (uploadInputRef.current) {
@@ -303,6 +312,16 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
 
         {/* Action Controls Toolbar */}
         <div className="flex items-center space-x-2">
+          {selectedFile && files.find((f) => f.name === selectedFile)?.isDir && (
+            <button
+              onClick={handleOpenSelectedFolder}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold transition-colors"
+            >
+              <Folder className="w-3.5 h-3.5" />
+              <span>Abrir Carpeta</span>
+            </button>
+          )}
+
           <button
             onClick={handleTriggerUpload}
             disabled={loading || manualPasswordPrompt}
@@ -311,6 +330,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
             <Upload className="w-3.5 h-3.5" />
             <span>Subir Archivo</span>
           </button>
+
 
           <button
             onClick={handleDownload}
@@ -475,12 +495,27 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
                         : "hover:bg-slate-800/40 text-slate-200"
                     }`}
                   >
-                    <td className="py-2 px-4 flex items-center space-x-2.5">
-                      {getFileIcon(file)}
-                      <span className={file.isDir ? "font-semibold text-slate-100" : "text-slate-300"}>
-                        {file.name}
-                      </span>
+                    <td className="py-2 px-4 flex items-center justify-between">
+                      <div className="flex items-center space-x-2.5">
+                        {getFileIcon(file)}
+                        <span className={file.isDir ? "font-semibold text-slate-100" : "text-slate-300"}>
+                          {file.name}
+                        </span>
+                      </div>
+                      {file.isDir && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenFolder(file);
+                          }}
+                          className="px-2 py-0.5 text-[10px] bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 rounded border border-amber-500/30 font-sans font-medium transition-colors"
+                          title="Abrir directorio"
+                        >
+                          Entrar ➔
+                        </button>
+                      )}
                     </td>
+
                     <td className="py-2 px-4 text-slate-400">{formatSize(file.size, file.isDir)}</td>
                     <td className="py-2 px-4 text-slate-500 text-[11px]">{file.permissions}</td>
                     <td className="py-2 px-4 text-slate-400 text-[11px]">{file.modified}</td>

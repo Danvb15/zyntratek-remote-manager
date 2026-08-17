@@ -173,13 +173,14 @@ pub async fn list_sftp_dir(
                 continue;
             }
 
-            let is_dir = stat.is_dir();
-            let size = stat.size.unwrap_or(0);
             let permissions = format_mode(stat.perm.unwrap_or(0));
+            let is_dir = stat.is_dir() || permissions.starts_with('d');
+            let size = stat.size.unwrap_or(0);
             let modified = stat
                 .mtime
                 .map(|t| chrono::DateTime::from_timestamp(t as i64, 0).map(|dt| dt.format("%Y-%m-%d %H:%M").to_string()).unwrap_or_default())
                 .unwrap_or_default();
+
 
             entries.push(SftpFileEntry {
                 name: name_str,
