@@ -12,12 +12,12 @@ import {
   Trash2,
   RefreshCw,
   ArrowLeft,
-  ChevronRight,
   HardDrive,
   Lock,
   Loader2,
   AlertCircle,
 } from "lucide-react";
+
 import { Connection } from "../../types/connection";
 
 interface SftpItem {
@@ -26,6 +26,11 @@ interface SftpItem {
   size: number;
   permissions: string;
   modified: string;
+}
+
+interface SftpDirResult {
+  current_path: string;
+  entries: SftpItem[];
 }
 
 interface SftpExplorerComponentProps {
@@ -38,6 +43,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
   onBack,
 }) => {
   const [currentPath, setCurrentPath] = useState<string>(".");
+  const [inputPath, setInputPath] = useState<string>(".");
   const [files, setFiles] = useState<SftpItem[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -56,12 +62,16 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
       setLoading(true);
       setErrorNotice(null);
       try {
-        const result = await invoke<SftpItem[]>("list_sftp_dir", {
+        const result = await invoke<SftpDirResult>("list_sftp_dir", {
           connectionId: connection.id,
           path: path,
           manualPassword: pass || (manualPassword ? manualPassword : null),
         });
-        setFiles(result);
+        setFiles(result.entries);
+        if (result.current_path) {
+          setCurrentPath(result.current_path);
+          setInputPath(result.current_path);
+        }
         setManualPasswordPrompt(false);
         setErrorNotice(null);
       } catch (err: unknown) {
@@ -272,9 +282,8 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
     }
   };
 
-  const pathParts = currentPath.split("/").filter((p) => p && p !== ".");
-
   return (
+
     <div className="flex flex-col h-full bg-[#0A1120] text-slate-100 font-sans rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
       {/* Hidden File Input */}
       <input
@@ -378,27 +387,42 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
         </div>
       </div>
 
-      {/* Breadcrumb Navigation Bar */}
-      <div className="flex items-center px-4 py-2 bg-[#0B1324] border-b border-slate-800/80 text-xs font-mono select-none">
-        <HardDrive className="w-3.5 h-3.5 text-slate-400 mr-2" />
-        <button
-          onClick={() => setCurrentPath("/")}
-          className="text-slate-400 hover:text-cyan-400 transition-colors"
+      {/* Breadcrumb Navigation Bar & Path Input */}
+      <div className="flex items-center space-x-2 px-4 py-2 bg-[#0B1324] border-b border-slate-800/80 text-xs font-mono select-none">
+        <HardDrive className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (inputPath.trim()) {
+              loadDirectory(inputPath.trim());
+            }
+          }}
+          className="flex-1 flex items-center"
         >
-          root
-        </button>
-        {pathParts.map((part, index) => (
-          <React.Fragment key={index}>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600 mx-1" />
-            <button
-              onClick={() => setCurrentPath("/" + pathParts.slice(0, index + 1).join("/"))}
-              className="text-slate-300 hover:text-cyan-400 transition-colors"
-            >
-              {part}
-            </button>
-          </React.Fragment>
-        ))}
+          <input
+            type="text"
+            value={inputPath}
+            onChange={(e) => setInputPath(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                loadDirectory(inputPath.trim());
+              }
+            }}
+            placeholder="Ruta remota (ej: /var/www/html)..."
+            className="w-full bg-slate-900/80 border border-slate-800 focus:border-cyan-500/50 rounded px-2.5 py-1 text-slate-200 focus:outline-none transition-colors text-xs font-mono"
+          />
+        </form>
+        <div className="flex items-center space-x-1 shrink-0 text-slate-400">
+          <button
+            onClick={() => loadDirectory("/")}
+            className="px-2 py-0.5 rounded bg-slate-800/60 hover:bg-slate-700 hover:text-cyan-300 text-[11px] transition-colors font-medium"
+            title="Ir al directorio raíz /"
+          >
+            / root
+          </button>
+        </div>
       </div>
+
 
       {/* Manual Password Prompt Modal Overlay */}
       {manualPasswordPrompt && (

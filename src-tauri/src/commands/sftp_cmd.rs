@@ -23,6 +23,12 @@ pub struct SftpFileEntry {
     pub modified: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SftpDirResult {
+    pub current_path: String,
+    pub entries: Vec<SftpFileEntry>,
+}
+
 fn connect_sftp_session(
     db: &State<'_, DbState>,
     vault: &State<'_, Arc<dyn SecretStore>>,
@@ -115,7 +121,6 @@ fn connect_sftp_session(
                         })?;
                 }
             }
-
         }
     } else {
         return Err(AppError::SshError(
@@ -144,11 +149,17 @@ pub async fn list_sftp_dir(
     connection_id: String,
     path: String,
     manual_password: Option<String>,
-) -> Result<Vec<SftpFileEntry>, AppError> {
+) -> Result<SftpDirResult, AppError> {
     info!("Listando directorio SFTP real en '{}'", path);
     let sftp = connect_sftp_session(&db, &vault, &connection_id, manual_password)?;
 
     let target_path = if path.trim().is_empty() { "." } else { &path };
+
+    let resolved_path = sftp
+        .realpath(Path::new(target_path))
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|_| target_path.to_string());
+
     let dir_entries = sftp.readdir(Path::new(target_path)).map_err(|e| {
         AppError::SshError(format!("Error leyendo directorio remoto '{}': {}", target_path, e))
     })?;
@@ -156,7 +167,7 @@ pub async fn list_sftp_dir(
     let mut entries = Vec::new();
 
     // Añadir entrada '..' si no es la raíz '/'
-    if target_path != "/" && target_path != "." {
+    if resolved_path != "/" && target_path != "/" {
         entries.push(SftpFileEntry {
             name: "..".into(),
             is_dir: true,
@@ -180,7 +191,6 @@ pub async fn list_sftp_dir(
                 .mtime
                 .map(|t| chrono::DateTime::from_timestamp(t as i64, 0).map(|dt| dt.format("%Y-%m-%d %H:%M").to_string()).unwrap_or_default())
                 .unwrap_or_default();
-
 
             entries.push(SftpFileEntry {
                 name: name_str,
@@ -207,10 +217,14 @@ pub async fn list_sftp_dir(
         }
     });
 
-    Ok(entries)
+    Ok(SftpDirResult {
+        current_path: resolved_path,
+        entries,
+    })
 }
 
 #[command]
+
 pub async fn create_sftp_dir(
     db: State<'_, DbState>,
     vault: State<'_, Arc<dyn SecretStore>>,
