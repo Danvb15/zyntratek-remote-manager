@@ -261,13 +261,17 @@ export const SettingsPage: React.FC = () => {
         <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
           <Cpu className="h-4 w-4 text-primary" /> Stack del Sistema
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+          <div className="p-3 bg-secondary/50 rounded-lg border border-border">
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Versión</span>
+            <span className="font-semibold text-emerald-400 font-mono">v1.1.0</span>
+          </div>
           <div className="p-3 bg-secondary/50 rounded-lg border border-border">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Desktop Layer</span>
             <span className="font-semibold text-foreground">Tauri 2.0 (Rust)</span>
           </div>
           <div className="p-3 bg-secondary/50 rounded-lg border border-border">
-            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Frontend Framework</span>
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Frontend</span>
             <span className="font-semibold text-foreground">React 18 + TS</span>
           </div>
           <div className="p-3 bg-secondary/50 rounded-lg border border-border">
@@ -275,8 +279,8 @@ export const SettingsPage: React.FC = () => {
             <span className="font-semibold text-foreground">Tailwind CSS</span>
           </div>
           <div className="p-3 bg-secondary/50 rounded-lg border border-border">
-            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Cifrado de Respaldo</span>
-            <span className="font-semibold text-foreground">AES-256-GCM + PBKDF2</span>
+            <span className="text-muted-foreground block text-[10px] uppercase font-bold">Cifrado Backup</span>
+            <span className="font-semibold text-foreground">AES-256-GCM</span>
           </div>
         </div>
       </div>
