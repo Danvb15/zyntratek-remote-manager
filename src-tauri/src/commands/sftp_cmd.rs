@@ -18,6 +18,8 @@ use crate::vault::{SecretPayload, SecretStore};
 pub struct SftpFileEntry {
     pub name: String,
     pub is_dir: bool,
+    #[serde(rename = "isDir")]
+    pub is_dir_camel: bool,
     pub size: u64,
     pub permissions: String,
     pub modified: String,
@@ -27,6 +29,28 @@ pub struct SftpFileEntry {
 pub struct SftpDirResult {
     pub current_path: String,
     pub entries: Vec<SftpFileEntry>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LocalItemEntry {
+    pub name: String,
+    pub is_dir: bool,
+    #[serde(rename = "isDir")]
+    pub is_dir_camel: bool,
+    pub size: u64,
+    pub modified: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LocalDirResult {
+    pub current_path: String,
+    pub entries: Vec<LocalItemEntry>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LocalDriveEntry {
+    pub name: String,
+    pub path: String,
 }
 
 fn connect_sftp_session(
@@ -171,6 +195,7 @@ pub async fn list_sftp_dir(
         entries.push(SftpFileEntry {
             name: "..".into(),
             is_dir: true,
+            is_dir_camel: true,
             size: 0,
             permissions: "drwxr-xr-x".into(),
             modified: "".into(),
@@ -184,10 +209,36 @@ pub async fn list_sftp_dir(
                 continue;
             }
 
-            let permissions = format_mode(stat.perm.unwrap_or(0));
-            let is_dir = stat.is_dir() || permissions.starts_with('d');
-            let size = stat.size.unwrap_or(0);
-            let modified = stat
+            let full_item_path = if resolved_path == "/" {
+                format!("/{}", name_str)
+            } else {
+                format!("{}/{}", resolved_path.trim_end_matches('/'), name_str)
+            };
+
+            // Detectar si es directorio de forma 100% infalible:
+            // 1. stat.is_dir() de readdir
+            // 2. Máscara octal S_IFDIR (0o040000)
+            // 3. Fallback explícito: sftp.stat() sobre la ruta del elemento
+            let mut is_dir = stat.is_dir() || (stat.perm.unwrap_or(0) & 0o040000) != 0;
+
+            let real_stat = if !is_dir {
+                if let Ok(st) = sftp.stat(Path::new(&full_item_path)) {
+                    if st.is_dir() || (st.perm.unwrap_or(0) & 0o040000) != 0 {
+                        is_dir = true;
+                    }
+                    Some(st)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
+            let effective_stat = real_stat.as_ref().unwrap_or(&stat);
+
+            let permissions = format_mode(effective_stat.perm.unwrap_or(0), is_dir);
+            let size = effective_stat.size.unwrap_or(0);
+            let modified = effective_stat
                 .mtime
                 .map(|t| chrono::DateTime::from_timestamp(t as i64, 0).map(|dt| dt.format("%Y-%m-%d %H:%M").to_string()).unwrap_or_default())
                 .unwrap_or_default();
@@ -195,6 +246,7 @@ pub async fn list_sftp_dir(
             entries.push(SftpFileEntry {
                 name: name_str,
                 is_dir,
+                is_dir_camel: is_dir,
                 size,
                 permissions,
                 modified,
@@ -335,9 +387,8 @@ pub async fn download_sftp_file(
     Ok(())
 }
 
-fn format_mode(mode: u32) -> String {
-
-    let is_dir = (mode & 0o040000) != 0;
+fn format_mode(mode: u32, is_dir_override: bool) -> String {
+    let is_dir = is_dir_override || (mode & 0o040000) != 0;
     let user_r = if (mode & 0o400) != 0 { 'r' } else { '-' };
     let user_w = if (mode & 0o200) != 0 { 'w' } else { '-' };
     let user_x = if (mode & 0o100) != 0 { 'x' } else { '-' };
@@ -363,4 +414,210 @@ fn format_mode(mode: u32) -> String {
         other_w,
         other_x
     )
+}
+
+#[command]
+pub fn get_local_roots() -> Result<Vec<LocalDriveEntry>, AppError> {
+    let mut roots = Vec::new();
+
+    if let Some(download) = dirs::download_dir() {
+        roots.push(LocalDriveEntry {
+            name: "Descargas".into(),
+            path: download.to_string_lossy().to_string(),
+        });
+    }
+    if let Some(doc) = dirs::document_dir() {
+        roots.push(LocalDriveEntry {
+            name: "Documentos".into(),
+            path: doc.to_string_lossy().to_string(),
+        });
+    }
+    if let Some(desk) = dirs::desktop_dir() {
+        roots.push(LocalDriveEntry {
+            name: "Escritorio".into(),
+            path: desk.to_string_lossy().to_string(),
+        });
+    }
+    if let Some(home) = dirs::home_dir() {
+        roots.push(LocalDriveEntry {
+            name: "Usuario (Home)".into(),
+            path: home.to_string_lossy().to_string(),
+        });
+    }
+
+    // Windows drives
+    for drive_letter in b'C'..=b'Z' {
+        let drive_str = format!("{}:\\", drive_letter as char);
+        let path = Path::new(&drive_str);
+        if path.exists() {
+            roots.push(LocalDriveEntry {
+                name: format!("Disco ({}:)", drive_letter as char),
+                path: drive_str,
+            });
+        }
+    }
+
+    Ok(roots)
+}
+
+#[command]
+pub fn list_local_dir(path: String) -> Result<LocalDirResult, AppError> {
+    let target_path = if path.trim().is_empty() {
+        dirs::download_dir()
+            .or_else(dirs::home_dir)
+            .unwrap_or_else(|| std::path::PathBuf::from("."))
+    } else {
+        std::path::PathBuf::from(path)
+    };
+
+    let canonical = target_path.canonicalize().unwrap_or_else(|_| target_path.clone());
+    let canonical_str = canonical.to_string_lossy().to_string();
+
+    let read_dir = std::fs::read_dir(&canonical).map_err(|_e| {
+        AppError::InternalError
+    })?;
+
+    let mut entries = Vec::new();
+
+    // Entrada '..' si tiene directorio padre
+    if canonical.parent().is_some() {
+        entries.push(LocalItemEntry {
+            name: "..".into(),
+            is_dir: true,
+            is_dir_camel: true,
+            size: 0,
+            modified: "".into(),
+        });
+    }
+
+    for item in read_dir.flatten() {
+        let file_name = item.file_name().to_string_lossy().to_string();
+        let metadata = item.metadata().ok();
+        let is_dir = metadata.as_ref().map(|m| m.is_dir()).unwrap_or(false);
+        let size = metadata.as_ref().map(|m| m.len()).unwrap_or(0);
+        let modified = metadata
+            .and_then(|m| m.modified().ok())
+            .map(|t| {
+                let dt: chrono::DateTime<chrono::Local> = t.into();
+                dt.format("%Y-%m-%d %H:%M").to_string()
+            })
+            .unwrap_or_default();
+
+        entries.push(LocalItemEntry {
+            name: file_name,
+            is_dir,
+            is_dir_camel: is_dir,
+            size,
+            modified,
+        });
+    }
+
+    // Ordenar: Carpetas primero, luego archivos
+    entries.sort_by(|a, b| {
+        if a.name == ".." {
+            return std::cmp::Ordering::Less;
+        }
+        if b.name == ".." {
+            return std::cmp::Ordering::Greater;
+        }
+        match (a.is_dir, b.is_dir) {
+            (true, false) => std::cmp::Ordering::Less,
+            (false, true) => std::cmp::Ordering::Greater,
+            _ => a.name.to_lowercase().cmp(&b.name.to_lowercase()),
+        }
+    });
+
+    Ok(LocalDirResult {
+        current_path: canonical_str,
+        entries,
+    })
+}
+
+#[command]
+pub fn create_local_dir(path: String) -> Result<(), AppError> {
+    std::fs::create_dir_all(Path::new(&path)).map_err(|_| AppError::InternalError)
+}
+
+#[command]
+pub fn delete_local_item(path: String, is_dir: bool) -> Result<(), AppError> {
+    let p = Path::new(&path);
+    if is_dir {
+        std::fs::remove_dir_all(p).map_err(|_| AppError::InternalError)
+    } else {
+        std::fs::remove_file(p).map_err(|_| AppError::InternalError)
+    }
+}
+
+#[command]
+pub async fn read_sftp_file_content(
+    db: State<'_, DbState>,
+    vault: State<'_, Arc<dyn SecretStore>>,
+    connection_id: String,
+    path: String,
+    manual_password: Option<String>,
+) -> Result<String, AppError> {
+    info!("Leyendo contenido de archivo SFTP remoto '{}'", path);
+    let sftp = connect_sftp_session(&db, &vault, &connection_id, manual_password)?;
+
+    let mut remote_file = sftp.open(Path::new(&path)).map_err(|e| {
+        AppError::SshError(format!("No se pudo abrir el archivo remoto '{}': {}", path, e))
+    })?;
+
+    let mut content = Vec::new();
+    let mut buffer = [0u8; 16384];
+    loop {
+        let bytes_read = remote_file.read(&mut buffer).map_err(|e| {
+            AppError::SshError(format!("Error leyendo archivo remoto: {}", e))
+        })?;
+        if bytes_read == 0 {
+            break;
+        }
+        content.extend_from_slice(&buffer[..bytes_read]);
+        if content.len() > 10 * 1024 * 1024 {
+            return Err(AppError::ValidationError(
+                "El archivo supera los 10 MB. Para archivos muy grandes use la descarga directa.".into(),
+            ));
+        }
+    }
+
+    String::from_utf8(content).map_err(|_| {
+        AppError::ValidationError("El archivo parece ser binario o no está codificado en UTF-8.".into())
+    })
+}
+
+#[command]
+pub async fn write_sftp_file_content(
+    db: State<'_, DbState>,
+    vault: State<'_, Arc<dyn SecretStore>>,
+    connection_id: String,
+    path: String,
+    content: String,
+    manual_password: Option<String>,
+) -> Result<(), AppError> {
+    info!("Guardando contenido en archivo SFTP remoto '{}'", path);
+    let sftp = connect_sftp_session(&db, &vault, &connection_id, manual_password)?;
+
+    let mut remote_file = sftp.create(Path::new(&path)).map_err(|e| {
+        AppError::SshError(format!("No se pudo crear/sobrescribir el archivo remoto '{}': {}", path, e))
+    })?;
+
+    remote_file.write_all(content.as_bytes()).map_err(|e| {
+        AppError::SshError(format!("Error guardando datos en archivo remoto: {}", e))
+    })?;
+
+    Ok(())
+}
+
+#[command]
+pub fn read_local_file_content(path: String) -> Result<String, AppError> {
+    std::fs::read_to_string(Path::new(&path)).map_err(|e| {
+        AppError::ValidationError(format!("No se pudo leer el archivo local: {}", e))
+    })
+}
+
+#[command]
+pub fn write_local_file_content(path: String, content: String) -> Result<(), AppError> {
+    std::fs::write(Path::new(&path), content).map_err(|e| {
+        AppError::ValidationError(format!("No se pudo guardar el archivo local: {}", e))
+    })
 }

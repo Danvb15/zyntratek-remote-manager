@@ -1,6 +1,6 @@
 [package]
 name = "zyntratek-remote-manager"
-version = "1.0.0"
+version = "1.1.0"
 
 description = "Zyntratek Remote Manager - Secure Remote Desktop & SSH Manager"
 authors = ["Zyntratek"]
@@ -31,12 +31,11 @@ ssh-key = "0.6.7"
 ssh2 = "0.9"
 
 async-trait = "0.1"
-
-
-
-
-
-
+aes-gcm = "0.10"
+pbkdf2 = { version = "0.12", default-features = false }
+sha2 = "0.10"
+rand = "0.8"
+base64 = "0.22"
 
 [dev-dependencies]
 tempfile = "3.8"

@@ -5,8 +5,9 @@ use uuid::Uuid;
 
 
 use crate::core::{
-    ConnectionDto, CreateConnectionPayload, CreateCredentialPayload, CredentialMetadataDto,
-    CredentialType, FolderDto, Protocol, TagDto, UpdateConnectionPayload, UpdateCredentialPayload,
+    ConnectionDto, CreateConnectionPayload, CreateCredentialPayload, CreateSnippetPayload,
+    CredentialMetadataDto, CredentialType, FolderDto, Protocol, SnippetDto, TagDto,
+    UpdateConnectionPayload, UpdateCredentialPayload, UpdateSnippetPayload,
 };
 use crate::error::AppError;
 
@@ -456,6 +457,29 @@ impl Repository {
         }
     }
 
+    pub fn update_tag(
+        conn: &SqliteConnection,
+        id: &str,
+        name: &str,
+        color: Option<&str>,
+    ) -> Result<TagDto, AppError> {
+        let default_color = "#64748b";
+        let final_color = color.unwrap_or(default_color);
+        let affected = conn.execute(
+            "UPDATE tags SET name = ?1, color = ?2 WHERE id = ?3",
+            params![name, final_color, id],
+        )?;
+        if affected == 0 {
+            Err(AppError::NotFound(format!("Tag with id {} not found", id)))
+        } else {
+            Ok(TagDto {
+                id: id.to_string(),
+                name: name.to_string(),
+                color: final_color.to_string(),
+            })
+        }
+    }
+
     fn get_connection_tags(conn: &SqliteConnection, connection_id: &str) -> Result<Vec<TagDto>, AppError> {
         let mut stmt = conn.prepare(
             "SELECT t.id, t.name, t.color
@@ -477,6 +501,128 @@ impl Repository {
             tags.push(r?);
         }
         Ok(tags)
+    }
+
+    // --- SNIPPET OPERATIONS ---
+
+    pub fn create_snippet(
+        conn: &SqliteConnection,
+        payload: &CreateSnippetPayload,
+    ) -> Result<SnippetDto, AppError> {
+        if payload.name.trim().is_empty() {
+            return Err(AppError::ValidationError("El nombre del snippet no puede estar vacío".into()));
+        }
+        if payload.command.trim().is_empty() {
+            return Err(AppError::ValidationError("El comando del snippet no puede estar vacío".into()));
+        }
+
+        let id = Uuid::new_v4().to_string();
+        let now = Utc::now().to_rfc3339();
+        let category = payload.category.as_deref().unwrap_or("General");
+
+        conn.execute(
+            "INSERT INTO snippets (id, name, command, category, description, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+            params![id, payload.name, payload.command, category, payload.description, now],
+        )?;
+
+        Ok(SnippetDto {
+            id,
+            name: payload.name.clone(),
+            command: payload.command.clone(),
+            category: category.to_string(),
+            description: payload.description.clone(),
+            created_at: now,
+        })
+    }
+
+    pub fn get_all_snippets(conn: &SqliteConnection) -> Result<Vec<SnippetDto>, AppError> {
+        let mut stmt = conn.prepare(
+            "SELECT id, name, command, category, description, created_at
+             FROM snippets
+             ORDER BY category ASC, name ASC",
+        )?;
+
+        let rows = stmt.query_map([], |row| {
+            Ok(SnippetDto {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                command: row.get(2)?,
+                category: row.get(3)?,
+                description: row.get(4)?,
+                created_at: row.get(5)?,
+            })
+        })?;
+
+        let mut list = Vec::new();
+        for r in rows {
+            list.push(r?);
+        }
+        Ok(list)
+    }
+
+    pub fn update_snippet(
+        conn: &SqliteConnection,
+        id: &str,
+        payload: &UpdateSnippetPayload,
+    ) -> Result<SnippetDto, AppError> {
+        let mut current_stmt = conn.prepare(
+            "SELECT id, name, command, category, description, created_at
+             FROM snippets
+             WHERE id = ?1",
+        )?;
+
+        let existing: SnippetDto = current_stmt
+            .query_row(params![id], |row| {
+                Ok(SnippetDto {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    command: row.get(2)?,
+                    category: row.get(3)?,
+                    description: row.get(4)?,
+                    created_at: row.get(5)?,
+                })
+            })
+            .map_err(|e| match e {
+                rusqlite::Error::QueryReturnedNoRows => {
+                    AppError::NotFound(format!("Snippet with id {} not found", id))
+                }
+                _ => AppError::DatabaseError(e.to_string()),
+            })?;
+
+        let final_name = payload.name.as_ref().unwrap_or(&existing.name);
+        let final_command = payload.command.as_ref().unwrap_or(&existing.command);
+        let final_category = payload.category.as_ref().unwrap_or(&existing.category);
+        let final_desc = if payload.description.is_some() {
+            payload.description.clone()
+        } else {
+            existing.description.clone()
+        };
+
+        conn.execute(
+            "UPDATE snippets
+             SET name = ?1, command = ?2, category = ?3, description = ?4
+             WHERE id = ?5",
+            params![final_name, final_command, final_category, final_desc, id],
+        )?;
+
+        Ok(SnippetDto {
+            id: id.to_string(),
+            name: final_name.clone(),
+            command: final_command.clone(),
+            category: final_category.clone(),
+            description: final_desc,
+            created_at: existing.created_at,
+        })
+    }
+
+    pub fn delete_snippet(conn: &SqliteConnection, id: &str) -> Result<(), AppError> {
+        let affected = conn.execute("DELETE FROM snippets WHERE id = ?1", params![id])?;
+        if affected == 0 {
+            Err(AppError::NotFound(format!("Snippet with id {} not found", id)))
+        } else {
+            Ok(())
+        }
     }
 }
 

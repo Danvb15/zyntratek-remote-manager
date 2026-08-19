@@ -8,7 +8,10 @@ import { sshService, SshEventData } from "@/services/tauri/ssh";
 import { credentialService } from "@/services/tauri/credentials";
 import { connectionService } from "@/services/tauri/connections";
 import { InteractivePasswordModal } from "./InteractivePasswordModal";
-import { Terminal as TerminalIcon, Power, ArrowLeft, KeyRound } from "lucide-react";
+import { SnippetDrawer } from "./SnippetDrawer";
+import { useTerminalSettings } from "@/hooks/useTerminalSettings";
+import { TERMINAL_THEMES } from "@/types/theme";
+import { Terminal as TerminalIcon, Power, ArrowLeft, KeyRound, Zap } from "lucide-react";
 
 interface SshTerminalComponentProps {
   connection: Connection;
@@ -19,6 +22,7 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
   connection,
   onBack,
 }) => {
+  const { settings } = useTerminalSettings();
   const terminalRef = useRef<HTMLDivElement | null>(null);
   const xtermRef = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
@@ -26,6 +30,7 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
 
   const [status, setStatus] = useState<"CONNECTING" | "CONNECTED" | "DISCONNECTED" | "ERROR">("CONNECTING");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isSnippetDrawerOpen, setIsSnippetDrawerOpen] = useState(false);
 
   const startConnectionSession = useCallback(
     async (manualPass?: string) => {
@@ -96,25 +101,16 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
   useEffect(() => {
     if (!terminalRef.current) return;
 
-    // 1. Initialize xterm.js Terminal with Dark Professional Theme
+    // 1. Initialize xterm.js Terminal with customized theme & font settings
+    const activeTheme = TERMINAL_THEMES[settings.themeName]?.theme || TERMINAL_THEMES.zyntratek.theme;
+
     const term = new XTerm({
-      cursorBlink: true,
-      fontSize: 13,
-      fontFamily: "Menlo, Monaco, 'Courier New', monospace",
-      theme: {
-        background: "#090d16",
-        foreground: "#f8fafc",
-        cursor: "#38bdf8",
-        selectionBackground: "#0284c740",
-        black: "#1e293b",
-        red: "#f87171",
-        green: "#4ade80",
-        yellow: "#facc15",
-        blue: "#60a5fa",
-        magenta: "#c084fc",
-        cyan: "#38bdf8",
-        white: "#f8fafc",
-      },
+      cursorBlink: settings.cursorBlink,
+      cursorStyle: settings.cursorStyle,
+      fontSize: settings.fontSize,
+      fontFamily: settings.fontFamily,
+      scrollback: settings.scrollback,
+      theme: activeTheme,
     });
 
     const fitAddon = new FitAddon();
@@ -193,10 +189,20 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
     await startConnectionSession(password);
   };
 
+  const handleRunSnippet = async (command: string) => {
+    if (!sessionIdRef.current || status !== "CONNECTED") return;
+    try {
+      const encoded = new TextEncoder().encode(`${command}\n`);
+      await sshService.sendInput(sessionIdRef.current, encoded);
+    } catch (err) {
+      console.error("Error sending snippet to SSH session:", err);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full w-full bg-background rounded-xl border border-border overflow-hidden select-none">
-      {/* Session Top Bar */}
-      <div className="h-12 bg-card border-b border-border px-4 flex items-center justify-between">
+    <div className="flex flex-col h-full w-full bg-background rounded-xl border border-border/80 overflow-hidden shadow-2xl">
+      {/* Top Header Bar */}
+      <div className="flex items-center justify-between px-4 py-2.5 bg-card/80 border-b border-border/80 select-none">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
@@ -215,8 +221,22 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
           </div>
         </div>
 
-        {/* Status indicator & Disconnect button */}
-        <div className="flex items-center gap-3">
+        {/* Status indicator, Snippets toggle & Disconnect button */}
+        <div className="flex items-center gap-2.5">
+          {/* Botón de Comandos Rápidos / Snippets */}
+          <button
+            onClick={() => setIsSnippetDrawerOpen((prev) => !prev)}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1.5 shadow-2xs ${
+              isSnippetDrawerOpen
+                ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                : "bg-secondary/60 text-muted-foreground hover:text-foreground border-border/80"
+            }`}
+            title="Comandos Rápidos y Snippets"
+          >
+            <Zap className="h-3.5 w-3.5 text-amber-400" />
+            <span>Snippets</span>
+          </button>
+
           {status === "ERROR" && (
             <button
               onClick={() => setShowAuthModal(true)}
@@ -256,9 +276,18 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
         </div>
       </div>
 
-      {/* Terminal Display Viewport */}
-      <div className="flex-1 p-2 bg-[#090d16] relative overflow-hidden">
-        <div ref={terminalRef} className="h-full w-full" />
+      {/* Main Terminal Viewport + Snippet Drawer Layout */}
+      <div className="flex-1 flex overflow-hidden bg-[#090d16] relative">
+        <div className="flex-1 p-2 h-full overflow-hidden">
+          <div ref={terminalRef} className="h-full w-full" />
+        </div>
+
+        {/* Snippet Drawer Panel */}
+        <SnippetDrawer
+          isOpen={isSnippetDrawerOpen}
+          onClose={() => setIsSnippetDrawerOpen(false)}
+          onRunSnippet={handleRunSnippet}
+        />
       </div>
 
       {/* Interactive Password Modal */}

@@ -4,9 +4,11 @@ pub mod folder_cmd;
 pub mod rdp_cmd;
 pub mod sftp_cmd;
 pub mod ssh_cmd;
+pub mod snippet_cmd;
 pub mod tag_cmd;
 pub mod vnc_cmd;
 pub mod web_cmd;
+pub mod backup_cmd;
 
 
 

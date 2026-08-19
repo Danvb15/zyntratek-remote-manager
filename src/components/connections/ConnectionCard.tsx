@@ -1,7 +1,7 @@
 import React from "react";
 import { Connection } from "@/types/connection";
 import { Badge } from "@/components/ui/Badge";
-import { Terminal, Monitor, Globe, Tv, FolderTree, Star, Copy, Edit2, Trash2, Play } from "lucide-react";
+import { Terminal, Monitor, Globe, Tv, FolderTree, Star, Copy, Edit2, Trash2, Play, Activity } from "lucide-react";
 
 interface ConnectionCardProps {
   connection: Connection;
@@ -10,6 +10,7 @@ interface ConnectionCardProps {
   onDuplicate: (conn: Connection) => void;
   onDelete: (conn: Connection) => void;
   onToggleFavorite: (conn: Connection) => void;
+  onCheckHealth?: (conn: Connection) => void;
 }
 
 export const ConnectionCard: React.FC<ConnectionCardProps> = ({
@@ -19,6 +20,7 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
   onDuplicate,
   onDelete,
   onToggleFavorite,
+  onCheckHealth,
 }) => {
   const isSSH = connection.protocol === "SSH";
   const isRDP = connection.protocol === "RDP";
@@ -102,6 +104,15 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
         </span>
 
         <div className="flex items-center gap-1">
+          {onCheckHealth && (isSSH || isSFTP) && (
+            <button
+              onClick={() => onCheckHealth(connection)}
+              className="p-1.5 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10 rounded-md transition-colors"
+              title="Monitor de Rendimiento en Vivo (CPU, RAM, Disco, Uptime)"
+            >
+              <Activity className="h-3.5 w-3.5" />
+            </button>
+          )}
           <button
             onClick={() => onDuplicate(connection)}
             className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md transition-colors"

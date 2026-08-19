@@ -165,3 +165,32 @@ pub struct UpdateConnectionPayload {
     pub tag_ids: Option<Vec<String>>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SnippetDto {
+    pub id: String,
+    pub name: String,
+    pub command: String,
+    pub category: String,
+    pub description: Option<String>,
+    pub created_at: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateSnippetPayload {
+    pub name: String,
+    pub command: String,
+    pub category: Option<String>,
+    pub description: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateSnippetPayload {
+    pub name: Option<String>,
+    pub command: Option<String>,
+    pub category: Option<String>,
+    pub description: Option<String>,
+}
+

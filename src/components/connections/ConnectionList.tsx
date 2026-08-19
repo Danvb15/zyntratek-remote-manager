@@ -12,6 +12,7 @@ interface ConnectionListProps {
   onDelete: (conn: Connection) => void;
   onToggleFavorite: (conn: Connection) => void;
   onCreateNew: () => void;
+  onCheckHealth?: (conn: Connection) => void;
 }
 
 export const ConnectionList: React.FC<ConnectionListProps> = ({
@@ -23,6 +24,7 @@ export const ConnectionList: React.FC<ConnectionListProps> = ({
   onDelete,
   onToggleFavorite,
   onCreateNew,
+  onCheckHealth,
 }) => {
   if (loading) {
     return (
@@ -78,6 +80,7 @@ export const ConnectionList: React.FC<ConnectionListProps> = ({
           onDuplicate={onDuplicate}
           onDelete={onDelete}
           onToggleFavorite={onToggleFavorite}
+          onCheckHealth={onCheckHealth}
         />
       ))}
     </div>

@@ -16,6 +16,7 @@ import {
   Tag as TagIcon,
   Plus,
   Trash2,
+  Edit2,
   Sliders,
   Layers,
 } from "lucide-react";
@@ -41,6 +42,8 @@ interface SidebarProps {
   onOpenCreateFolderModal: () => void;
   onOpenCreateTagModal: () => void;
   onDeleteFolder: (id: string) => void;
+  onEditTag?: (tag: Tag) => void;
+  onDeleteTag?: (id: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -61,6 +64,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenCreateFolderModal,
   onOpenCreateTagModal,
   onDeleteFolder,
+  onEditTag,
+  onDeleteTag,
 }) => {
   // Counters
   const totalCount = connections.length;
@@ -343,32 +348,75 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           <div className="flex flex-wrap gap-1.5 px-3 pt-1">
-            {tags.map((tag) => {
-              const isSelected = selectedTagId === tag.id;
-              return (
-                <button
-                  key={tag.id}
-                  onClick={() => {
-                    onSelectView("CONNECTIONS");
-                    onSelectTag(isSelected ? null : tag.id);
-                    onSelectProtocolFilter("ALL");
-                    onSelectFavoriteFilter("ALL");
-                    onSelectFolder(null);
-                  }}
-                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium border transition-all ${
-                    isSelected ? "ring-2 ring-primary border-primary" : "opacity-80 hover:opacity-100"
-                  }`}
-                  style={{
-                    backgroundColor: `${tag.color}15`,
-                    borderColor: `${tag.color}40`,
-                    color: tag.color,
-                  }}
-                >
-                  <TagIcon className="h-3 w-3" />
-                  {tag.name}
-                </button>
-              );
-            })}
+            {tags.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground italic">Sin etiquetas creadas</p>
+            ) : (
+              tags.map((tag) => {
+                const isSelected = selectedTagId === tag.id;
+                return (
+                  <div
+                    key={tag.id}
+                    className="group relative inline-flex items-center"
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      if (onEditTag) onEditTag(tag);
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        onSelectView("CONNECTIONS");
+                        onSelectTag(isSelected ? null : tag.id);
+                        onSelectProtocolFilter("ALL");
+                        onSelectFavoriteFilter("ALL");
+                        onSelectFolder(null);
+                      }}
+                      className={`inline-flex items-center gap-1.5 pl-2 pr-1.5 py-0.5 rounded-md text-[11px] font-medium border transition-all ${
+                        isSelected ? "ring-2 ring-primary border-primary font-bold" : "opacity-85 hover:opacity-100"
+                      }`}
+                      style={{
+                        backgroundColor: `${tag.color}15`,
+                        borderColor: `${tag.color}40`,
+                        color: tag.color,
+                      }}
+                      title={`Clic para filtrar por "${tag.name}". Clic derecho o lápiz para editar.`}
+                    >
+                      <TagIcon className="h-3 w-3" />
+                      <span>{tag.name}</span>
+
+                      {/* Botones de Editar y Eliminar en hover */}
+                      <span className="inline-flex items-center gap-0.5 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {onEditTag && (
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditTag(tag);
+                            }}
+                            className="p-0.5 hover:bg-black/30 rounded text-muted-foreground hover:text-foreground cursor-pointer"
+                            title="Editar etiqueta"
+                          >
+                            <Edit2 className="h-2.5 w-2.5" />
+                          </span>
+                        )}
+                        {onDeleteTag && (
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm(`¿Eliminar la etiqueta "${tag.name}"?`)) {
+                                onDeleteTag(tag.id);
+                              }
+                            }}
+                            className="p-0.5 hover:bg-destructive/30 rounded text-muted-foreground hover:text-destructive cursor-pointer"
+                            title="Eliminar etiqueta"
+                          >
+                            <Trash2 className="h-2.5 w-2.5" />
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 

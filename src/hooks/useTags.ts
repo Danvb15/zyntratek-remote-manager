@@ -30,6 +30,12 @@ export function useTags() {
     return created;
   };
 
+  const updateTag = async (id: string, name: string, color?: string) => {
+    const updated = await tagService.update(id, name, color);
+    setTags((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    return updated;
+  };
+
   const deleteTag = async (id: string) => {
     await tagService.delete(id);
     setTags((prev) => prev.filter((t) => t.id !== id));
@@ -41,6 +47,7 @@ export function useTags() {
     error,
     refresh: fetchTags,
     createTag,
+    updateTag,
     deleteTag,
   };
 }

@@ -47,4 +47,13 @@ CREATE TABLE IF NOT EXISTS connection_tags (
 CREATE INDEX IF NOT EXISTS idx_connections_folder ON connections(folder_id);
 CREATE INDEX IF NOT EXISTS idx_connections_favorite ON connections(favorite);
 CREATE INDEX IF NOT EXISTS idx_folders_parent ON folders(parent_id);
+
+CREATE TABLE IF NOT EXISTS snippets (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    command TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'General',
+    description TEXT,
+    created_at TEXT NOT NULL
+);
 "#;

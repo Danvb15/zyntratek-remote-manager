@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Search, Plus, RefreshCw, HelpCircle } from "lucide-react";
+import { Search, Plus, RefreshCw, HelpCircle, Database } from "lucide-react";
 import { Protocol } from "@/types/connection";
 
 interface TopbarProps {
@@ -10,6 +10,7 @@ interface TopbarProps {
   onOpenCreateConnectionModal: () => void;
   onRefresh: () => void;
   onOpenOnboarding?: () => void;
+  onOpenBackup?: () => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
@@ -21,6 +22,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenCreateConnectionModal,
   onRefresh,
   onOpenOnboarding,
+  onOpenBackup,
   searchInputRef,
 }) => {
 
@@ -115,6 +117,18 @@ export const Topbar: React.FC<TopbarProps> = ({
 
 
         </div>
+
+        {/* Backup / Export Button */}
+        {onOpenBackup && (
+          <button
+            onClick={onOpenBackup}
+            className="p-2 border border-border bg-secondary text-muted-foreground hover:text-emerald-400 rounded-xl hover:bg-secondary/80 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+            title="Copia de Seguridad, Exportación e Importación (.zyntra)"
+          >
+            <Database className="h-4 w-4 text-emerald-400" />
+            <span className="hidden md:inline">Respaldo</span>
+          </button>
+        )}
 
         {/* Help / Guía Button */}
         {onOpenOnboarding && (

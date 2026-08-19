@@ -34,3 +34,17 @@ pub fn delete_tag(
     let conn = db.conn.lock().map_err(|_| AppError::InternalError)?;
     Repository::delete_tag(&conn, &id)
 }
+
+#[tauri::command]
+pub fn update_tag(
+    db: State<'_, DbState>,
+    id: String,
+    name: String,
+    color: Option<String>,
+) -> Result<TagDto, AppError> {
+    if name.trim().is_empty() {
+        return Err(AppError::ValidationError("Tag name cannot be empty".into()));
+    }
+    let conn = db.conn.lock().map_err(|_| AppError::InternalError)?;
+    Repository::update_tag(&conn, &id, &name, color.as_deref())
+}
