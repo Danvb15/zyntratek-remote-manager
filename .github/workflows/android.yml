@@ -27,7 +27,7 @@ jobs:
       - name: Install Android NDK & System Packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y libssl-dev pkg-config
+          sudo apt-get install -y libssl-dev pkg-config perl build-essential
           sdkmanager --install "ndk;29.0.13846066"
 
       - name: Setup Node.js
@@ -47,6 +47,7 @@ jobs:
       - name: Build Android APK
         env:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13846066
+          PATH: ${{ env.ANDROID_HOME }}/ndk/29.0.13846066/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
         run: |
           npx tauri android build --apk
 
