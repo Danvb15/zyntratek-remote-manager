@@ -8,7 +8,7 @@ pub mod vault;
 use std::sync::Arc;
 use db::DbState;
 use protocols::{RdpSessionManager, SshSessionManager};
-use vault::{HybridVaultStore, SecretStore};
+use vault::SecretStore;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

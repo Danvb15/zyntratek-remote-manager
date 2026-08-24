@@ -12,15 +12,21 @@ pub async fn open_web_console_window(
         .parse::<url::Url>()
         .map_err(|e| format!("URL inválida: {}", e))?;
 
-    let builder = WebviewWindowBuilder::new(
+    #[allow(unused_mut)]
+    let mut builder = WebviewWindowBuilder::new(
         &app,
         window_label,
         WebviewUrl::External(parsed_url),
     )
-    .title(title)
-    .inner_size(1280.0, 800.0)
-    .center()
-    .resizable(true);
+    .title(title);
+
+    #[cfg(desktop)]
+    {
+        builder = builder
+            .inner_size(1280.0, 800.0)
+            .center()
+            .resizable(true);
+    }
 
     builder
         .build()
