@@ -1,9 +1,9 @@
-use zyntratek_remote_manager::core::{CreateConnectionPayload, Protocol};
-use zyntratek_remote_manager::db::repository::Repository;
-use zyntratek_remote_manager::db::DbState;
-use zyntratek_remote_manager::protocols::rdp::launcher::RdpLaunchConfig;
-use zyntratek_remote_manager::protocols::{RdpSessionManager, SshSessionManager};
-use zyntratek_remote_manager::vault::{InMemoryVaultStore, SecretPayload, SecretStore};
+use zyntratek_remote_manager_lib::core::{CreateConnectionPayload, Protocol};
+use zyntratek_remote_manager_lib::db::repository::Repository;
+use zyntratek_remote_manager_lib::db::DbState;
+use zyntratek_remote_manager_lib::protocols::rdp::launcher::RdpLaunchConfig;
+use zyntratek_remote_manager_lib::protocols::{RdpSessionManager, SshSessionManager};
+use zyntratek_remote_manager_lib::vault::{InMemoryVaultStore, SecretPayload, SecretStore};
 use tempfile::tempdir;
 
 #[test]

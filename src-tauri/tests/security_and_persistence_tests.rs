@@ -1,12 +1,12 @@
 use rusqlite::Connection as SqliteConnection;
 use tempfile::NamedTempFile;
-use zyntratek_remote_manager::core::{
+use zyntratek_remote_manager_lib::core::{
     CreateConnectionPayload, CreateCredentialPayload, CredentialType, Protocol,
 };
-use zyntratek_remote_manager::db::migrations::run_migrations;
-use zyntratek_remote_manager::db::repository::Repository;
-use zyntratek_remote_manager::error::AppError;
-use zyntratek_remote_manager::vault::{InMemoryVaultStore, SecretPayload, SecretStore};
+use zyntratek_remote_manager_lib::db::migrations::run_migrations;
+use zyntratek_remote_manager_lib::db::repository::Repository;
+use zyntratek_remote_manager_lib::error::AppError;
+use zyntratek_remote_manager_lib::vault::{InMemoryVaultStore, SecretPayload, SecretStore};
 
 #[test]
 fn test_requirement_1_secrets_never_appear_in_sqlite() {

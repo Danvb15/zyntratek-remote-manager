@@ -21,11 +21,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Android SDK & NDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android NDK
+      - name: Install Android NDK & System Packages
         run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev pkg-config
           sdkmanager --install "ndk;29.0.13846066"
 
       - name: Setup Node.js
@@ -39,7 +41,7 @@ jobs:
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
 
-      - name: Install dependencies
+      - name: Install npm dependencies
         run: npm ci
 
       - name: Build Android APK
@@ -52,4 +54,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: zyntratek-remote-manager-android-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk

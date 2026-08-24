@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    zyntratek_remote_manager::run();
+    zyntratek_remote_manager_lib::run();
 }

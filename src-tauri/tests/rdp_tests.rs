@@ -1,6 +1,6 @@
-use zyntratek_remote_manager::protocols::rdp::launcher::RdpLaunchConfig;
-use zyntratek_remote_manager::protocols::RdpSessionManager;
-use zyntratek_remote_manager::vault::SecretPayload;
+use zyntratek_remote_manager_lib::protocols::rdp::launcher::RdpLaunchConfig;
+use zyntratek_remote_manager_lib::protocols::RdpSessionManager;
+use zyntratek_remote_manager_lib::vault::SecretPayload;
 
 #[test]
 fn test_rdp_launch_config_contains_zero_passwords_in_arguments() {

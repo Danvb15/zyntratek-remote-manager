@@ -1,5 +1,5 @@
-use zyntratek_remote_manager::protocols::ssh::known_hosts::{KnownHostsStore, HostVerificationResult};
-use zyntratek_remote_manager::protocols::SshSessionManager;
+use zyntratek_remote_manager_lib::protocols::ssh::known_hosts::{KnownHostsStore, HostVerificationResult};
+use zyntratek_remote_manager_lib::protocols::SshSessionManager;
 use tempfile::tempdir;
 
 #[test]
