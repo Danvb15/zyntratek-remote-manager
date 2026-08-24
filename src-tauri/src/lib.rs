@@ -6,6 +6,7 @@ pub mod protocols;
 pub mod vault;
 
 use std::sync::Arc;
+use tauri::Manager;
 use db::DbState;
 use protocols::{RdpSessionManager, SshSessionManager};
 use vault::SecretStore;
@@ -13,26 +14,36 @@ use vault::SecretStore;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let app_dir = dirs::data_dir()
-        .map(|d| d.join("zyntratek-remote-manager"))
-        .unwrap_or_else(|| std::path::PathBuf::from("."));
-
-    let _ = std::fs::create_dir_all(&app_dir);
-    let db_path = app_dir.join("zyntratek.db");
-
-    let db_state = DbState::new_file_db(db_path.to_str().unwrap())
-        .expect("Failed to initialize SQLite database");
-
-    let vault_store: Arc<dyn SecretStore> = Arc::new(vault::HybridVaultStore::new(app_dir.clone()));
-
-    let ssh_manager = Arc::new(SshSessionManager::new(app_dir.clone()));
-    let rdp_manager = Arc::new(RdpSessionManager::new());
-
     tauri::Builder::default()
-        .manage(db_state)
-        .manage(vault_store)
-        .manage(ssh_manager)
-        .manage(rdp_manager)
+        .setup(|app| {
+            let app_dir = app
+                .path()
+                .app_data_dir()
+                .unwrap_or_else(|_| {
+                    dirs::data_dir()
+                        .map(|d| d.join("zyntratek-remote-manager"))
+                        .unwrap_or_else(|| std::path::PathBuf::from("."))
+                });
+
+            let _ = std::fs::create_dir_all(&app_dir);
+            let db_path = app_dir.join("zyntratek.db");
+
+            let db_state = DbState::new_file_db(db_path.to_str().unwrap_or("zyntratek.db"))
+                .expect("Failed to initialize SQLite database");
+
+            let vault_store: Arc<dyn SecretStore> =
+                Arc::new(vault::HybridVaultStore::new(app_dir.clone()));
+
+            let ssh_manager = Arc::new(SshSessionManager::new(app_dir.clone()));
+            let rdp_manager = Arc::new(RdpSessionManager::new());
+
+            app.manage(db_state);
+            app.manage(vault_store);
+            app.manage(ssh_manager);
+            app.manage(rdp_manager);
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             commands::ping,
             commands::credential_cmd::create_credential,
