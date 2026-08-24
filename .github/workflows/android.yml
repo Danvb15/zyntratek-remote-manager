@@ -28,9 +28,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libssl-dev pkg-config perl build-essential
-          sdkmanager --install "ndk;29.0.13846066"
+          sdkmanager --install "ndk;29.0.13846066" "build-tools;34.0.0"
           echo "NDK_HOME=${{ env.ANDROID_HOME }}/ndk/29.0.13846066" >> $GITHUB_ENV
           echo "${{ env.ANDROID_HOME }}/ndk/29.0.13846066/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
+          echo "${{ env.ANDROID_HOME }}/build-tools/34.0.0" >> $GITHUB_PATH
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -50,8 +51,22 @@ jobs:
         run: |
           npx tauri android build --apk
 
+      - name: Sign Android APK
+        run: |
+          keytool -genkey -v -keystore release.keystore -alias zyntratek -keyalg RSA -keysize 2048 -validity 10000 -storepass zyntratek123 -keypass zyntratek123 -dname "CN=Zyntratek, OU=Mobile, O=Zyntratek, L=Global, S=Global, C=US"
+          shopt -s globstar
+          for apk in src-tauri/gen/android/app/build/outputs/apk/**/*.apk; do
+            if [[ "$apk" == *"-unsigned.apk" ]]; then
+              signed_apk="${apk/-unsigned.apk/-signed.apk}"
+              echo "Firmando $apk -> $signed_apk"
+              apksigner sign --ks release.keystore --ks-pass pass:zyntratek123 --key-pass pass:zyntratek123 --out "$signed_apk" "$apk"
+            fi
+          done
+
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: zyntratek-remote-manager-android-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          path: |
+            src-tauri/gen/android/app/build/outputs/apk/**/*-signed.apk
+            src-tauri/gen/android/app/build/outputs/apk/**/*.apk
