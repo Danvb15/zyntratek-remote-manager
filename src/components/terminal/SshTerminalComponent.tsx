@@ -10,7 +10,9 @@ import { connectionService } from "@/services/tauri/connections";
 import { InteractivePasswordModal } from "./InteractivePasswordModal";
 import { SnippetDrawer } from "./SnippetDrawer";
 import { useTerminalSettings } from "@/hooks/useTerminalSettings";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { TERMINAL_THEMES } from "@/types/theme";
+import { MobileTerminalKeypad } from "./MobileTerminalKeypad";
 import { Terminal as TerminalIcon, Power, ArrowLeft, KeyRound, Zap } from "lucide-react";
 
 interface SshTerminalComponentProps {
@@ -29,8 +31,34 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
   const sessionIdRef = useRef<string | null>(null);
 
   const [status, setStatus] = useState<"CONNECTING" | "CONNECTED" | "DISCONNECTED" | "ERROR">("CONNECTING");
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isSnippetDrawerOpen, setIsSnippetDrawerOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [isSnippetDrawerOpen, setIsSnippetDrawerOpen] = useState<boolean>(false);
+
+  const isMobile = useIsMobile();
+  const [mobileFontSize, setMobileFontSize] = useState<number>(() => {
+    return window.innerWidth < 768 ? 12 : settings.fontSize;
+  });
+
+  const handleSendMobileKey = async (key: string) => {
+    if (!sessionIdRef.current || status !== "CONNECTED") return;
+    try {
+      const encoded = new TextEncoder().encode(key);
+      await sshService.sendInput(sessionIdRef.current, encoded);
+    } catch (err) {
+      console.error("Error enviando tecla a la sesión SSH:", err);
+    }
+  };
+
+  const handleZoom = (delta: number) => {
+    setMobileFontSize((prev) => {
+      const next = Math.min(24, Math.max(10, prev + delta));
+      if (xtermRef.current) {
+        xtermRef.current.options.fontSize = next;
+        fitAddonRef.current?.fit();
+      }
+      return next;
+    });
+  };
 
   const startConnectionSession = useCallback(
     async (manualPass?: string) => {
@@ -107,7 +135,7 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
     const term = new XTerm({
       cursorBlink: settings.cursorBlink,
       cursorStyle: settings.cursorStyle,
-      fontSize: settings.fontSize,
+      fontSize: isMobile ? mobileFontSize : settings.fontSize,
       fontFamily: settings.fontFamily,
       scrollback: settings.scrollback,
       theme: activeTheme,
@@ -289,6 +317,16 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
           onRunSnippet={handleRunSnippet}
         />
       </div>
+
+      {/* Mobile Virtual Keypad Bar */}
+      {isMobile && status === "CONNECTED" && (
+        <MobileTerminalKeypad
+          onSendKey={handleSendMobileKey}
+          onZoomIn={() => handleZoom(1)}
+          onZoomOut={() => handleZoom(-1)}
+          onOpenSnippets={() => setIsSnippetDrawerOpen(true)}
+        />
+      )}
 
       {/* Interactive Password Modal */}
       <InteractivePasswordModal

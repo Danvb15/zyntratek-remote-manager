@@ -44,38 +44,38 @@ export const Topbar: React.FC<TopbarProps> = ({
   }, [onOpenCreateConnectionModal, searchInputRef]);
 
   return (
-    <header className="h-16 border-b border-border bg-card/60 backdrop-blur-xs px-6 flex items-center justify-between gap-4 select-none">
+    <header className="border-b border-border bg-card/60 backdrop-blur-xs px-3 sm:px-6 py-2.5 sm:py-0 sm:h-16 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 select-none">
       {/* Global Search Input */}
-      <div className="relative flex-1 max-w-md">
+      <div className="relative flex-1 max-w-full sm:max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           ref={searchInputRef as React.RefObject<HTMLInputElement>}
           type="text"
-          placeholder="Buscar conexiones por nombre, host, usuario, protocolo..."
+          placeholder="Buscar conexiones por nombre, host, usuario..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full bg-secondary border border-border rounded-xl pl-9 pr-12 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
+          className="w-full bg-secondary border border-border rounded-xl pl-9 pr-10 sm:pr-12 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary focus:outline-hidden"
         />
-        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 px-1.5 py-0.5 bg-background border border-border rounded-md text-[10px] font-mono text-muted-foreground">
+        <div className="hidden sm:flex absolute right-2.5 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 py-0.5 bg-background border border-border rounded-md text-[10px] font-mono text-muted-foreground">
           <span>⌘</span><span>K</span>
         </div>
       </div>
 
-      {/* Action Controls */}
-      <div className="flex items-center gap-3">
-        {/* Protocol Quick Selector */}
-        <div className="flex items-center p-0.5 bg-secondary border border-border rounded-xl text-xs font-medium">
+      {/* Action Controls & Protocol Selector */}
+      <div className="flex items-center justify-between sm:justify-end gap-2 overflow-x-auto scrollbar-none pb-0.5 sm:pb-0">
+        {/* Protocol Quick Selector (Scrollable on mobile) */}
+        <div className="flex items-center p-0.5 bg-secondary border border-border rounded-xl text-xs font-medium shrink-0 overflow-x-auto scrollbar-none">
           <button
             onClick={() => onProtocolFilterChange("ALL")}
-            className={`px-3 py-1 rounded-lg transition-colors ${
-              protocolFilter === "ALL" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors shrink-0 ${
+              protocolFilter === "ALL" ? "bg-background text-foreground shadow-xs font-semibold" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Todos
           </button>
           <button
             onClick={() => onProtocolFilterChange("SSH")}
-            className={`px-3 py-1 rounded-lg transition-colors ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors shrink-0 ${
               protocolFilter === "SSH" ? "bg-emerald-500/20 text-emerald-300 font-semibold" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -83,7 +83,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           </button>
           <button
             onClick={() => onProtocolFilterChange("RDP")}
-            className={`px-3 py-1 rounded-lg transition-colors ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors shrink-0 ${
               protocolFilter === "RDP" ? "bg-blue-500/20 text-blue-300 font-semibold" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -91,7 +91,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           </button>
           <button
             onClick={() => onProtocolFilterChange("WEB")}
-            className={`px-3 py-1 rounded-lg transition-colors ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors shrink-0 ${
               protocolFilter === "WEB" ? "bg-purple-500/20 text-purple-300 font-semibold" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -99,7 +99,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           </button>
           <button
             onClick={() => onProtocolFilterChange("VNC")}
-            className={`px-3 py-1 rounded-lg transition-colors ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors shrink-0 ${
               protocolFilter === "VNC" ? "bg-amber-500/20 text-amber-300 font-semibold" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -107,60 +107,59 @@ export const Topbar: React.FC<TopbarProps> = ({
           </button>
           <button
             onClick={() => onProtocolFilterChange("SFTP")}
-            className={`px-3 py-1 rounded-lg transition-colors ${
+            className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors shrink-0 ${
               protocolFilter === "SFTP" ? "bg-cyan-500/20 text-cyan-300 font-semibold" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             SFTP
           </button>
-
-
-
         </div>
 
-        {/* Backup / Export Button */}
-        {onOpenBackup && (
+        {/* Action icons */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Backup / Export Button */}
+          {onOpenBackup && (
+            <button
+              onClick={onOpenBackup}
+              className="p-1.5 sm:p-2 border border-border bg-secondary text-muted-foreground hover:text-emerald-400 rounded-xl hover:bg-secondary/80 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+              title="Copia de Seguridad (.zyntra)"
+            >
+              <Database className="h-4 w-4 text-emerald-400" />
+              <span className="hidden md:inline">Respaldo</span>
+            </button>
+          )}
+
+          {/* Help / Guía Button */}
+          {onOpenOnboarding && (
+            <button
+              onClick={onOpenOnboarding}
+              className="p-1.5 sm:p-2 border border-border bg-secondary text-muted-foreground hover:text-primary rounded-xl hover:bg-secondary/80 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+              title="Guía de Inicio Rápido"
+            >
+              <HelpCircle className="h-4 w-4 text-primary" />
+              <span className="hidden md:inline">Guía</span>
+            </button>
+          )}
+
+          {/* Refresh Button */}
           <button
-            onClick={onOpenBackup}
-            className="p-2 border border-border bg-secondary text-muted-foreground hover:text-emerald-400 rounded-xl hover:bg-secondary/80 transition-colors flex items-center gap-1.5 text-xs font-semibold"
-            title="Copia de Seguridad, Exportación e Importación (.zyntra)"
+            onClick={onRefresh}
+            className="p-1.5 sm:p-2 border border-border bg-secondary text-muted-foreground hover:text-foreground rounded-xl hover:bg-secondary/80 transition-colors"
+            title="Recargar conexiones"
           >
-            <Database className="h-4 w-4 text-emerald-400" />
-            <span className="hidden md:inline">Respaldo</span>
+            <RefreshCw className="h-4 w-4" />
           </button>
-        )}
 
-        {/* Help / Guía Button */}
-        {onOpenOnboarding && (
+          {/* New Connection Button (Desktop only, mobile has FAB) */}
           <button
-            onClick={onOpenOnboarding}
-            className="p-2 border border-border bg-secondary text-muted-foreground hover:text-primary rounded-xl hover:bg-secondary/80 transition-colors flex items-center gap-1.5 text-xs font-semibold"
-            title="Ver Guía de Inicio Rápido: Claves y Contraseñas"
+            onClick={onOpenCreateConnectionModal}
+            className="hidden sm:flex px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-xl hover:bg-primary/90 transition-colors items-center gap-2 shadow-xs shrink-0"
           >
-            <HelpCircle className="h-4 w-4 text-primary" />
-            <span className="hidden md:inline">Guía</span>
+            <Plus className="h-4 w-4" />
+            Nueva Conexión
+            <span className="ml-1 opacity-60 font-mono text-[10px]">⌘N</span>
           </button>
-        )}
-
-        {/* Refresh Button */}
-        <button
-          onClick={onRefresh}
-          className="p-2 border border-border bg-secondary text-muted-foreground hover:text-foreground rounded-xl hover:bg-secondary/80 transition-colors"
-          title="Recargar conexiones y metadatos"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </button>
-
-
-        {/* New Connection Button */}
-        <button
-          onClick={onOpenCreateConnectionModal}
-          className="px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-xs"
-        >
-          <Plus className="h-4 w-4" />
-          Nueva Conexión
-          <span className="ml-1 opacity-60 font-mono text-[10px]">⌘N</span>
-        </button>
+        </div>
       </div>
     </header>
   );

@@ -28,11 +28,15 @@ import { VncViewerComponent } from "@/components/vnc/VncViewerComponent";
 import { SftpExplorerComponent } from "@/components/sftp/SftpExplorerComponent";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Connection, CreateConnectionPayload, UpdateConnectionPayload, Tag } from "@/types/connection";
 import { CredentialMetadata, CreateCredentialPayload, UpdateCredentialPayload } from "@/types/credential";
-import { Filter, X } from "lucide-react";
+import { Filter, X, Layers, Terminal, FolderTree, Monitor, Globe, LayoutDashboard } from "lucide-react";
 
 export function App() {
+  const isMobile = useIsMobile();
+  const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState<boolean>(false);
   const [currentView, setCurrentView] = useState<"CONNECTIONS" | "CREDENTIALS" | "SETTINGS">("CONNECTIONS");
 
   // Onboarding Guide Modal State
@@ -283,31 +287,33 @@ export function App() {
             activeTabId === null ? "flex" : "hidden"
           }`}
         >
-          {/* Sidebar */}
-          <Sidebar
-            currentView={currentView}
-            onSelectView={setCurrentView}
-            connections={connections}
-            credentials={credentials}
-            folders={folders}
-            tags={tags}
-            protocolFilter={protocolFilter}
-            onSelectProtocolFilter={setProtocolFilter}
-            favoriteFilter={favoriteFilter}
-            onSelectFavoriteFilter={setFavoriteFilter}
-            selectedFolderId={folderFilter}
-            onSelectFolder={setFolderFilter}
-            selectedTagId={selectedTagId}
-            onSelectTag={setSelectedTagId}
-            onOpenCreateFolderModal={() => setIsFolderModalOpen(true)}
-            onOpenCreateTagModal={() => setIsTagModalOpen(true)}
-            onDeleteFolder={(id) => setDeletingFolderId(id)}
-            onEditTag={(tag) => setEditingTag(tag)}
-            onDeleteTag={async (id) => {
-              await deleteTag(id);
-              refreshConnections();
-            }}
-          />
+          {/* Sidebar (Desktop only) */}
+          <div className="hidden md:flex h-full shrink-0">
+            <Sidebar
+              currentView={currentView}
+              onSelectView={setCurrentView}
+              connections={connections}
+              credentials={credentials}
+              folders={folders}
+              tags={tags}
+              protocolFilter={protocolFilter}
+              onSelectProtocolFilter={setProtocolFilter}
+              favoriteFilter={favoriteFilter}
+              onSelectFavoriteFilter={setFavoriteFilter}
+              selectedFolderId={folderFilter}
+              onSelectFolder={setFolderFilter}
+              selectedTagId={selectedTagId}
+              onSelectTag={setSelectedTagId}
+              onOpenCreateFolderModal={() => setIsFolderModalOpen(true)}
+              onOpenCreateTagModal={() => setIsTagModalOpen(true)}
+              onDeleteFolder={(id) => setDeletingFolderId(id)}
+              onEditTag={(tag) => setEditingTag(tag)}
+              onDeleteTag={async (id) => {
+                await deleteTag(id);
+                refreshConnections();
+              }}
+            />
+          </div>
 
           {/* Main Dashboard Panel */}
           <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -328,7 +334,7 @@ export function App() {
             />
 
             {/* View Content */}
-            <main className="flex-1 p-6 overflow-y-auto">
+            <main className="flex-1 p-3 sm:p-6 pb-24 sm:pb-6 overflow-y-auto">
               {currentView === "CONNECTIONS" && (
                 <div className="space-y-4 max-w-7xl mx-auto">
                   {/* Header & Filter Breadcrumbs */}
@@ -606,6 +612,130 @@ export function App() {
         onClose={() => setIsOnboardingOpen(false)}
         onNavigateToVault={() => setCurrentView("CREDENTIALS")}
       />
+
+      {/* Mobile Bottom Navigation Bar */}
+      {isMobile && (
+        <MobileBottomNav
+          currentView={currentView}
+          onSelectView={(v) => {
+            setCurrentView(v);
+            setActiveTabId(null);
+          }}
+          activeSessionCount={sessionTabs.length}
+          activeTabId={activeTabId}
+          onOpenSessionsModal={() => setIsMobileSessionsOpen(true)}
+          onOpenCreateModal={() => {
+            if (currentView === "CREDENTIALS") {
+              handleOpenCreateCredential();
+            } else {
+              handleOpenCreateConnection();
+            }
+          }}
+        />
+      )}
+
+      {/* Mobile Sessions Drawer / Bottom Sheet */}
+      {isMobile && isMobileSessionsOpen && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex flex-col justify-end animate-in fade-in duration-200">
+          <div className="bg-[#0D1527] border-t border-border rounded-t-2xl p-4 max-h-[75vh] flex flex-col shadow-2xl pb-10">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <div className="flex items-center gap-2">
+                <Layers className="h-5 w-5 text-cyan-400" />
+                <h3 className="font-bold text-sm text-foreground">Sesiones Activas ({sessionTabs.length})</h3>
+              </div>
+              <button
+                onClick={() => setIsMobileSessionsOpen(false)}
+                className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto py-3 space-y-2 flex-1">
+              <button
+                onClick={() => {
+                  setActiveTabId(null);
+                  setIsMobileSessionsOpen(false);
+                }}
+                className={`w-full p-3 rounded-xl border flex items-center justify-between text-left transition-all ${
+                  activeTabId === null
+                    ? "bg-primary/20 border-primary text-primary font-semibold"
+                    : "bg-secondary/40 border-border text-foreground hover:bg-secondary"
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <LayoutDashboard className="h-4 w-4 text-primary" />
+                  <div>
+                    <div className="text-xs font-semibold">Panel de Control</div>
+                    <div className="text-[10px] text-muted-foreground">Administrador de Conexiones</div>
+                  </div>
+                </div>
+                {activeTabId === null && <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-bold">Activo</span>}
+              </button>
+
+              {sessionTabs.length === 0 ? (
+                <div className="text-center py-6 text-xs text-muted-foreground">
+                  No hay sesiones remotas abiertas actualmente.
+                </div>
+              ) : (
+                sessionTabs.map((tab) => {
+                  const isTabActive = activeTabId === tab.id;
+                  return (
+                    <div
+                      key={tab.id}
+                      className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
+                        isTabActive
+                          ? "bg-cyan-950/60 border-cyan-500/80 shadow-md"
+                          : "bg-secondary/40 border-border hover:bg-secondary"
+                      }`}
+                    >
+                      <button
+                        onClick={() => {
+                          setActiveTabId(tab.id);
+                          setIsMobileSessionsOpen(false);
+                        }}
+                        className="flex items-center gap-2.5 flex-1 text-left"
+                      >
+                        <div className="p-2 rounded-lg bg-background border border-border">
+                          {tab.protocol === "SSH" ? (
+                            <Terminal className="h-4 w-4 text-emerald-400" />
+                          ) : tab.protocol === "SFTP" ? (
+                            <FolderTree className="h-4 w-4 text-cyan-400" />
+                          ) : tab.protocol === "RDP" ? (
+                            <Monitor className="h-4 w-4 text-blue-400" />
+                          ) : (
+                            <Globe className="h-4 w-4 text-purple-400" />
+                          )}
+                        </div>
+                        <div className="overflow-hidden">
+                          <div className="text-xs font-semibold text-foreground flex items-center gap-1.5 truncate">
+                            <span>{tab.title}</span>
+                            <span className="text-[9px] px-1.5 py-0.2 bg-secondary rounded text-muted-foreground font-mono">{tab.protocol}</span>
+                          </div>
+                          <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[180px]">
+                            {tab.connection.username}@{tab.connection.host}
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCloseTab(tab.id);
+                        }}
+                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors ml-2"
+                        title="Cerrar sesión"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
