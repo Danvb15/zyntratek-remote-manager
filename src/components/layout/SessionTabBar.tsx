@@ -48,14 +48,14 @@ export const SessionTabBar: React.FC<SessionTabBarProps> = ({
   };
 
   return (
-    <div className="flex items-center bg-background/90 backdrop-blur-md border-b border-border/80 px-2 pt-1 gap-1 overflow-x-auto select-none scrollbar-none shrink-0 h-10 transition-colors">
+    <div className="flex items-center bg-background border-b border-border px-2 pt-1 gap-1 overflow-x-auto select-none scrollbar-none shrink-0 h-10 transition-colors">
       {/* Dashboard / Main View Tab */}
       <button
         onClick={() => onSelectTab(null)}
-        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-t-xl text-xs font-semibold transition-all border-t border-x ${
+        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-t-md text-xs font-semibold transition-all border-t border-x ${
           activeTabId === null
-            ? "bg-card text-foreground border-border border-b-transparent shadow-xs"
-            : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border-transparent"
+            ? "bg-card text-foreground border-border border-b-transparent shadow-2xs"
+            : "text-muted-foreground hover:text-foreground hover:bg-secondary/60 border-transparent"
         }`}
         title="Panel Principal de Conexiones"
       >
@@ -70,10 +70,10 @@ export const SessionTabBar: React.FC<SessionTabBarProps> = ({
           <div
             key={tab.id}
             onClick={() => onSelectTab(tab.id)}
-            className={`group flex items-center gap-2 pl-3 pr-1.5 py-1.5 rounded-t-xl text-xs font-medium cursor-pointer transition-all border-t border-x max-w-[210px] ${
+            className={`group flex items-center gap-2 pl-3 pr-1.5 py-1.5 rounded-t-md text-xs font-medium cursor-pointer transition-all border-t border-x max-w-[210px] ${
               isActive
-                ? "bg-card text-foreground border-border border-b-transparent shadow-xs font-semibold"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border-transparent"
+                ? "bg-card text-foreground border-border border-b-transparent shadow-2xs font-semibold"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary/60 border-transparent"
             }`}
           >
             <div className="flex items-center gap-1.5 truncate">

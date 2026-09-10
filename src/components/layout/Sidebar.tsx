@@ -258,10 +258,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {onOpenThemeSelector && (
             <button
               onClick={onOpenThemeSelector}
-              className="p-2.5 rounded-xl transition-all text-muted-foreground hover:bg-secondary hover:text-cyan-400"
+              className="p-2 rounded-md transition-all text-muted-foreground hover:bg-secondary hover:text-foreground"
               title={`Tema Visual (${activeThemeName || "Personalizar"})`}
             >
-              <Palette className="h-4.5 w-4.5 text-cyan-400" />
+              <Palette className="h-4.5 w-4.5" />
             </button>
           )}
         </div>
@@ -642,17 +642,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <button
             onClick={() => onSelectView("MONITORING")}
-            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-md font-medium transition-colors ${
               currentView === "MONITORING"
-                ? "bg-cyan-600 text-white shadow-xs font-semibold"
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                ? "bg-secondary text-foreground font-semibold shadow-2xs"
+                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
             }`}
           >
             <div className="flex items-center gap-2.5">
-              <Activity className="h-4 w-4 text-cyan-400" />
+              <Activity className="h-4 w-4 text-primary" />
               <span>Monitoreo en Vivo</span>
             </div>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono font-bold">
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono font-medium">
               NOC
             </span>
           </button>
@@ -661,22 +661,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Security / Vault Category */}
         <div className="space-y-1 pt-2">
           <div className="px-3 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-            Seguridad & Aspecto
+            Configuración & Apariencia
           </div>
 
           <button
             onClick={() => onSelectView("CREDENTIALS")}
-            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-md font-medium transition-colors ${
               currentView === "CREDENTIALS"
-                ? "bg-primary text-primary-foreground shadow-xs"
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                ? "bg-secondary text-foreground font-semibold shadow-2xs"
+                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Shield className="h-4 w-4" />
               <span>Vault de Credenciales</span>
             </div>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-secondary/80 text-foreground font-mono">
+            <span className="text-[11px] px-1.5 py-0.5 rounded bg-secondary text-foreground font-mono">
               {vaultCount}
             </span>
           </button>
@@ -684,15 +684,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {onOpenThemeSelector && (
             <button
               onClick={onOpenThemeSelector}
-              className="w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground group"
+              className="w-full flex items-center justify-between px-3 py-2 text-xs rounded-md font-medium transition-colors text-muted-foreground hover:bg-secondary/60 hover:text-foreground group"
               title="Personalizar Tema Visual"
             >
               <div className="flex items-center gap-2.5">
-                <Palette className="h-4 w-4 text-cyan-400 group-hover:rotate-12 transition-transform" />
+                <Palette className="h-4 w-4 text-foreground" />
                 <span>Tema Visual</span>
               </div>
               {activeThemeName && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono font-medium">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground border border-border font-medium">
                   {activeThemeName}
                 </span>
               )}
@@ -701,10 +701,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <button
             onClick={() => onSelectView("SETTINGS")}
-            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-md font-medium transition-colors ${
               currentView === "SETTINGS"
-                ? "bg-primary text-primary-foreground shadow-xs"
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                ? "bg-secondary text-foreground font-semibold shadow-2xs"
+                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
             }`}
           >
             <div className="flex items-center gap-2.5">

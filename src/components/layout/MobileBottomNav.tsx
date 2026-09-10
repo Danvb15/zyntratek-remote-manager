@@ -25,12 +25,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onOpenCreateModal,
 }) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-card/90 backdrop-blur-xl border-t border-border/80 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.5)] md:hidden transition-colors">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-xs md:hidden transition-colors">
       <div className="flex items-center justify-around relative max-w-md mx-auto">
         {/* 1. Conexiones */}
         <button
           onClick={() => onSelectView("CONNECTIONS")}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1.5 rounded-xl transition-all ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1.5 rounded-md transition-all ${
             currentView === "CONNECTIONS" && activeTabId === null
               ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
@@ -39,7 +39,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           <div className="relative">
             <Server className="h-4.5 w-4.5 mb-0.5" />
             {currentView === "CONNECTIONS" && activeTabId === null && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full" />
             )}
           </div>
           <span className="text-[10px] tracking-tight mt-0.5">Conexiones</span>
@@ -48,16 +48,16 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         {/* 2. Monitoreo en Vivo (NOC) */}
         <button
           onClick={() => onSelectView("MONITORING")}
-          className={`flex flex-col items-center justify-center flex-1 py-1 px-1.5 rounded-xl transition-all ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1.5 rounded-md transition-all ${
             currentView === "MONITORING" && activeTabId === null
-              ? "text-cyan-400 font-semibold"
+              ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <div className="relative">
             <Activity className="h-4.5 w-4.5 mb-0.5" />
             {currentView === "MONITORING" && activeTabId === null && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full" />
             )}
           </div>
           <span className="text-[10px] tracking-tight mt-0.5">Monitoreo</span>

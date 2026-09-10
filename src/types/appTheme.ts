@@ -1,8 +1,7 @@
 export type AppThemeId =
-  | "cyberpunk-obsidian"
-  | "macos-glass"
-  | "vercel-titanium"
-  | "oled-pure-black";
+  | "win11-light"
+  | "win11-dark"
+  | "win11-slate";
 
 export interface AppThemeMeta {
   id: AppThemeId;
@@ -10,75 +9,70 @@ export interface AppThemeMeta {
   tagline: string;
   description: string;
   badge: string;
+  isDark: boolean;
   preview: {
     bg: string;
     card: string;
     primary: string;
     accent: string;
     border: string;
+    text: string;
   };
   styleClass: string;
 }
 
 export const APP_THEMES: Record<AppThemeId, AppThemeMeta> = {
-  "cyberpunk-obsidian": {
-    id: "cyberpunk-obsidian",
-    name: "Cyberpunk Obsidian",
-    tagline: "Estilo Warp & Linear",
-    description: "Fondo negro carbón ultra profundo con halos luminosos cian y verde esmeralda.",
-    badge: "Recomendado",
+  "win11-light": {
+    id: "win11-light",
+    name: "Windows 11 Claro Oficial",
+    tagline: "Mica Light / Fluent Oficial",
+    description: "Fondo gris perla suave, tarjetas blanco puro con borde micro-fino y azul oficial de Windows 11.",
+    badge: "Predeterminado",
+    isDark: false,
     preview: {
-      bg: "#08090E",
-      card: "#0F111A",
-      primary: "#06B6D4",
-      accent: "#10B981",
-      border: "rgba(6, 182, 212, 0.25)",
+      bg: "#F3F3F3",
+      card: "#FFFFFF",
+      primary: "#0067C0",
+      accent: "#0078D4",
+      border: "#E5E5E5",
+      text: "#1C1C1C",
     },
-    styleClass: "theme-obsidian",
+    styleClass: "theme-win11-light",
   },
-  "macos-glass": {
-    id: "macos-glass",
-    name: "macOS Frosted Glass",
-    tagline: "Estilo Apple & Raycast",
-    description: "Superficies translúcidas con desenfoque de cristal líquido, zafiro suave y bordes especulares.",
-    badge: "Elegante",
+  "win11-dark": {
+    id: "win11-dark",
+    name: "Windows 11 Oscuro",
+    tagline: "Mica Dark / Windows Terminal",
+    description: "Gris carbón neutro de Windows Terminal, sin luces de neón, con tipografía clara de alto contraste.",
+    badge: "Sobrio",
+    isDark: true,
     preview: {
-      bg: "#0C1222",
-      card: "rgba(22, 33, 58, 0.7)",
-      primary: "#3B82F6",
-      accent: "#60A5FA",
-      border: "rgba(255, 255, 255, 0.15)",
+      bg: "#202020",
+      card: "#2C2C2C",
+      primary: "#60CDFF",
+      accent: "#0078D4",
+      border: "#3D3D3D",
+      text: "#FFFFFF",
     },
-    styleClass: "theme-glass",
+    styleClass: "theme-win11-dark",
   },
-  "vercel-titanium": {
-    id: "vercel-titanium",
-    name: "Vercel Titanium",
-    tagline: "Minimalismo Silicon Valley",
-    description: "Escala monocromática de titanio oscuro con tipografía blanca nítida y contraste puro.",
-    badge: "Minimal",
+  "win11-slate": {
+    id: "win11-slate",
+    name: "Corporativo Platino",
+    tagline: "Slate Light Profesional",
+    description: "Gris pizarra azulado tenue con tarjetas blanco nítido y acento azul marino para sysadmins.",
+    badge: "Oficina",
+    isDark: false,
     preview: {
-      bg: "#000000",
-      card: "#121212",
-      primary: "#FFFFFF",
-      accent: "#10B981",
-      border: "#262626",
+      bg: "#F1F5F9",
+      card: "#FFFFFF",
+      primary: "#1E40AF",
+      accent: "#2563EB",
+      border: "#CBD5E1",
+      text: "#0F172A",
     },
-    styleClass: "theme-titanium",
-  },
-  "oled-pure-black": {
-    id: "oled-pure-black",
-    name: "OLED Negro Puro",
-    tagline: "Ahorro Máximo de Batería",
-    description: "Negro absoluto #000000 para pantallas OLED/AMOLED con azul cielo de alto contraste.",
-    badge: "OLED Ahorro",
-    preview: {
-      bg: "#000000",
-      card: "#080808",
-      primary: "#38BDF8",
-      accent: "#06B6D4",
-      border: "#1F1F1F",
-    },
-    styleClass: "theme-oled",
+    styleClass: "theme-win11-slate",
   },
 };
+
+export const DEFAULT_APP_THEME_ID: AppThemeId = "win11-light";

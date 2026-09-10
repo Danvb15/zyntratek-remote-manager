@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Database, Cpu, Palette, Terminal, Type, RotateCcw, Check, Sparkles } from "lucide-react";
+import { Shield, Database, Cpu, Palette, Terminal, Type, RotateCcw, Check } from "lucide-react";
 import { useTerminalSettings } from "@/hooks/useTerminalSettings";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { TERMINAL_THEMES } from "@/types/theme";
@@ -20,20 +20,20 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* App General Visual Theme Section */}
-      <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-xs">
-        <div className="flex items-center gap-2.5 border-b border-border/70 pb-3">
-          <div className="p-2 bg-primary/10 text-primary border border-primary/20 rounded-xl">
-            <Sparkles className="h-5 w-5" />
+      <div className="bg-card border border-border rounded-lg p-5 space-y-4 shadow-2xs">
+        <div className="flex items-center gap-2.5 border-b border-border pb-3">
+          <div className="p-2 bg-primary/10 text-primary border border-primary/20 rounded-md">
+            <Palette className="h-5 w-5" />
           </div>
           <div>
             <h3 className="font-semibold text-sm text-foreground">Tema Visual de la Aplicación</h3>
             <p className="text-xs text-muted-foreground">
-              Selecciona el estilo y paleta general de Zyntratek Remote Manager
+              Selecciona el estilo nativo de Windows 11 (Claro Oficial, Oscuro o Platino)
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
           {allThemes.map((t) => {
             const isSelected = t.id === themeId;
 
@@ -41,15 +41,15 @@ export const SettingsPage: React.FC = () => {
               <div
                 key={t.id}
                 onClick={() => setThemeId(t.id)}
-                className={`p-4 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between group ${
+                className={`p-4 rounded-lg border text-left cursor-pointer transition-all flex flex-col justify-between group ${
                   isSelected
-                    ? "border-primary bg-primary/10 shadow-md ring-1 ring-primary"
-                    : "border-border bg-secondary/40 hover:bg-secondary/70 hover:border-border"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary shadow-2xs"
+                    : "border-border bg-card hover:bg-secondary/60 hover:border-border/80"
                 }`}
               >
                 <div>
-                  <div className="flex items-start justify-between gap-1 mb-1">
-                    <div className="font-bold text-xs text-foreground flex items-center gap-1.5">
+                  <div className="flex items-start justify-between gap-1 mb-1.5">
+                    <div className="font-semibold text-xs text-foreground flex items-center gap-1.5">
                       <span>{t.name}</span>
                       {isSelected && (
                         <span className="p-0.5 rounded-full bg-primary text-primary-foreground">
@@ -57,48 +57,37 @@ export const SettingsPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <span
-                      className={`text-[9px] font-mono px-1.5 py-0.2 rounded border font-semibold shrink-0 ${
-                        isSelected
-                          ? "bg-primary/20 text-primary border-primary/40"
-                          : "bg-secondary text-muted-foreground border-border"
-                      }`}
-                    >
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-secondary text-muted-foreground border border-border">
                       {t.badge}
                     </span>
                   </div>
 
-                  <p className="text-[11px] text-muted-foreground leading-snug">
+                  <p className="text-xs text-muted-foreground leading-snug">
                     {t.description}
                   </p>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between">
-                  <div className="flex items-center gap-1">
+                <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
                     <span
-                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
+                      className="h-3.5 w-3.5 rounded-full border border-border shadow-2xs"
                       style={{ backgroundColor: t.preview.bg }}
                       title="Fondo"
                     />
                     <span
-                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
+                      className="h-3.5 w-3.5 rounded-full border border-border shadow-2xs"
                       style={{ backgroundColor: t.preview.card }}
                       title="Tarjeta"
                     />
                     <span
-                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
+                      className="h-3.5 w-3.5 rounded-full border border-border shadow-2xs"
                       style={{ backgroundColor: t.preview.primary }}
                       title="Color Primario"
                     />
-                    <span
-                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
-                      style={{ backgroundColor: t.preview.accent }}
-                      title="Acento"
-                    />
                   </div>
 
-                  <span className="text-[10px] font-semibold text-foreground opacity-70 group-hover:opacity-100 group-hover:text-primary transition-colors">
-                    {isSelected ? "Activo" : "Elegir"}
+                  <span className={`text-[11px] font-medium transition-colors ${isSelected ? "text-primary font-semibold" : "text-muted-foreground group-hover:text-foreground"}`}>
+                    {isSelected ? "Activo" : "Seleccionar"}
                   </span>
                 </div>
               </div>

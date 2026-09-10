@@ -3,156 +3,122 @@
 @tailwind utilities;
 
 @layer base {
-  /* 1. Cyberpunk Obsidian (Default) */
+  /* 1. Windows 11 Claro Oficial (Mica Light) - Predeterminado */
   :root,
-  .theme-obsidian {
-    --background: 230 27% 4.3%;
-    --foreground: 210 40% 98%;
+  .theme-win11-light {
+    --background: 0 0% 95.3%; /* #F3F3F3 Mica Base */
+    --foreground: 0 0% 11%;   /* #1C1C1C High Contrast Text */
 
-    --card: 229 27% 7.8%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;        /* #FFFFFF Pure White Card */
+    --card-foreground: 0 0% 11%;
 
-    --popover: 229 27% 7.8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 189 94% 43%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 208 100% 37.6%; /* #0067C0 Windows 11 Blue */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 227 26% 11.2%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 92.5%;   /* #ECECEC Subdued button/fill */
+    --secondary-foreground: 0 0% 11%;
 
-    --muted: 227 26% 11.2%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 93.5%;
+    --muted-foreground: 0 0% 40%; /* #666666 Subtitle */
 
-    --accent: 160 84% 39%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 227 22% 16%;
-    --input: 227 22% 16%;
-    --ring: 189 94% 43%;
-
-    --radius: 0.75rem;
-    --theme-glow: rgba(6, 182, 212, 0.25);
-  }
-
-  /* 2. macOS Frosted Glass */
-  .theme-glass {
-    --background: 222 47% 8.4%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 40% 12.5%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 40% 12.5%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-
-    --secondary: 222 30% 18%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 222 30% 18%;
-    --muted-foreground: 215 25% 72%;
-
-    --accent: 217 91% 60%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 222 25% 24%;
-    --input: 222 25% 24%;
-    --ring: 217 91% 60%;
-
-    --radius: 1rem;
-    --theme-glow: rgba(59, 130, 246, 0.25);
-  }
-
-  /* 3. Vercel Titanium */
-  .theme-titanium {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-
-    --card: 0 0% 6.7%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 6.7%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 5%;
-
-    --secondary: 0 0% 11%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 0 0% 11%;
-    --muted-foreground: 0 0% 63%;
-
-    --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 0 0% 100%;
-
-    --radius: 0.5rem;
-    --theme-glow: rgba(255, 255, 255, 0.15);
-  }
-
-  /* 4. OLED Negro Puro */
-  .theme-oled {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-
-    --card: 0 0% 2.5%;
-    --card-foreground: 0 0% 100%;
-
-    --popover: 0 0% 2.5%;
-    --popover-foreground: 0 0% 100%;
-
-    --primary: 199 89% 48%;
-    --primary-foreground: 0 0% 0%;
-
-    --secondary: 0 0% 6%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 0 0% 6%;
-    --muted-foreground: 0 0% 65%;
-
-    --accent: 189 94% 43%;
+    --accent: 208 100% 37.6%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 11%;
-    --input: 0 0% 11%;
-    --ring: 199 89% 48%;
+    --border: 0 0% 89%;        /* #E3E3E3 Subtle 1px crisp border */
+    --input: 0 0% 89%;
+    --ring: 208 100% 37.6%;
 
-    --radius: 0.625rem;
-    --theme-glow: rgba(56, 189, 248, 0.25);
+    --radius: 0.5rem;          /* 8px Fluent Standard */
+    --theme-glow: transparent;
+  }
+
+  /* 2. Windows 11 Oscuro (Mica Dark / Windows Terminal) */
+  .theme-win11-dark {
+    --background: 0 0% 12.5%;  /* #202020 Windows 11 Dark */
+    --foreground: 0 0% 100%;   /* #FFFFFF Pure White Text */
+
+    --card: 0 0% 17.3%;        /* #2C2C2C Elevated Surface */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 17.3%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 199 100% 68.6%; /* #60CDFF Windows 11 Accent Blue */
+    --primary-foreground: 0 0% 10%;
+
+    --secondary: 0 0% 21.6%;   /* #373737 */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 21.6%;
+    --muted-foreground: 0 0% 65%; /* #A6A6A6 */
+
+    --accent: 199 100% 68.6%;
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 24%;        /* #3D3D3D */
+    --input: 0 0% 24%;
+    --ring: 199 100% 68.6%;
+
+    --radius: 0.5rem;
+    --theme-glow: transparent;
+  }
+
+  /* 3. Corporativo Platino (Slate Light) */
+  .theme-win11-slate {
+    --background: 210 40% 96.1%; /* #F1F5F9 Slate 100 */
+    --foreground: 222 47% 11.2%; /* #0F172A Slate 900 */
+
+    --card: 0 0% 100%;           /* #FFFFFF */
+    --card-foreground: 222 47% 11.2%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11.2%;
+
+    --primary: 221 83% 53.3%;   /* #2563EB Royal Blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 214 32% 91%;    /* #E2E8F0 Slate 200 */
+    --secondary-foreground: 222 47% 11.2%;
+
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%; /* #64748B */
+
+    --accent: 221 83% 53.3%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 89%;      /* #DEE5ED */
+    --input: 214 32% 89%;
+    --ring: 221 83% 53.3%;
+
+    --radius: 0.5rem;
+    --theme-glow: transparent;
   }
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   user-select: none;
   overflow: hidden;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-/* Scrollbar styling */
+/* Scrollbar sobrio estilo Windows 11 */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
