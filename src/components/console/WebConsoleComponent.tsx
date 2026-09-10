@@ -25,7 +25,7 @@ export const WebConsoleComponent: React.FC<WebConsoleComponentProps> = ({
 }) => {
   // Construct initial URL
   const getInitialUrl = () => {
-    let host = connection.host;
+    const host = connection.host;
     if (host.startsWith("http://") || host.startsWith("https://")) {
       return host;
     }
@@ -91,6 +91,7 @@ export const WebConsoleComponent: React.FC<WebConsoleComponentProps> = ({
   // Auto-launch native window when component mounts
   useEffect(() => {
     handleOpenNativeWindow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

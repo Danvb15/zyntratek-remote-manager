@@ -80,7 +80,7 @@ interface ContextMenuState {
 /**
  * Función infalible para determinar si un elemento es carpeta / directorio
  */
-export const isFolder = (item: SftpItem | LocalItem | null | undefined): boolean => {
+const isFolder = (item: SftpItem | LocalItem | null | undefined): boolean => {
   if (!item) return false;
   if (item.name === "..") return true;
   if (typeof item.isDir === "boolean" && item.isDir) return true;
@@ -367,6 +367,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activePane,
     selectedLocalFile,

@@ -28,21 +28,21 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
   const isSFTP = connection.protocol === "SFTP";
 
   return (
-    <div className="group relative bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex flex-col justify-between">
+    <div className="group relative bg-card/80 backdrop-blur-xs border border-border/80 hover:border-primary/60 rounded-2xl p-4.5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex flex-col justify-between">
       {/* Top Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div
-            className={`p-2.5 rounded-xl border ${
+            className={`p-2.5 rounded-xl border shadow-2xs transition-transform group-hover:scale-105 ${
               isSSH
-                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                 : isRDP
-                ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
                 : isVNC
-                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
                 : isSFTP
-                ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
-                : "bg-purple-500/10 text-purple-400 border-purple-500/20"
+                ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+                : "bg-purple-500/10 text-purple-400 border-purple-500/30"
             }`}
           >
             {isSSH ? (
@@ -98,8 +98,8 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
       )}
 
       {/* Footer Actions */}
-      <div className="pt-3 border-t border-border/50 flex items-center justify-between">
-        <span className="text-[11px] font-medium text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-xs border border-border">
+      <div className="pt-3 border-t border-border/60 flex items-center justify-between">
+        <span className="text-[10px] font-mono font-semibold text-muted-foreground bg-secondary/80 px-2 py-0.5 rounded-md border border-border">
           {connection.protocol}
         </span>
 
@@ -107,7 +107,7 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
           {onCheckHealth && (isSSH || isSFTP) && (
             <button
               onClick={() => onCheckHealth(connection)}
-              className="p-1.5 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10 rounded-md transition-colors"
+              className="p-1.5 text-muted-foreground hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-colors"
               title="Monitor de Rendimiento en Vivo (CPU, RAM, Disco, Uptime)"
             >
               <Activity className="h-3.5 w-3.5" />
@@ -115,28 +115,28 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
           )}
           <button
             onClick={() => onDuplicate(connection)}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
             title="Duplicar conexión"
           >
             <Copy className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => onEdit(connection)}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
             title="Editar conexión"
           >
             <Edit2 className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => onDelete(connection)}
-            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
             title="Eliminar conexión"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => onConnect(connection)}
-            className="ml-1 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-xs"
+            className="ml-1.5 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-xl hover:bg-primary/90 transition-all flex items-center gap-1.5 shadow-xs hover:scale-102 active:scale-98"
           >
             <Play className="h-3 w-3 fill-current" />
             Conectar

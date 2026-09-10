@@ -93,6 +93,8 @@ pub fn run() {
             commands::snippet_cmd::delete_snippet,
             commands::backup_cmd::export_backup_data,
             commands::backup_cmd::import_backup_data,
+            commands::monitoring_cmd::check_single_server_ping,
+            commands::monitoring_cmd::check_all_servers_ping,
         ])
 
 

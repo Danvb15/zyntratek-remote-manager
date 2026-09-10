@@ -28,7 +28,10 @@ import { VncViewerComponent } from "@/components/vnc/VncViewerComponent";
 import { SftpExplorerComponent } from "@/components/sftp/SftpExplorerComponent";
 import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
+import { MonitoringDashboardPage } from "./pages/monitoring/MonitoringDashboardPage";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useAppTheme } from "@/hooks/useAppTheme";
+import { ThemeSelectorModal } from "@/components/theme/ThemeSelectorModal";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Connection, CreateConnectionPayload, UpdateConnectionPayload, Tag } from "@/types/connection";
 import { CredentialMetadata, CreateCredentialPayload, UpdateCredentialPayload } from "@/types/credential";
@@ -36,8 +39,22 @@ import { Filter, X, Layers, Terminal, FolderTree, Monitor, Globe, LayoutDashboar
 
 export function App() {
   const isMobile = useIsMobile();
+  const { themeId, setThemeId, allThemes } = useAppTheme();
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    return localStorage.getItem("zyntratek_sidebar_collapsed") === "true";
+  });
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("zyntratek_sidebar_collapsed", String(next));
+      return next;
+    });
+  };
+
   const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState<boolean>(false);
-  const [currentView, setCurrentView] = useState<"CONNECTIONS" | "CREDENTIALS" | "SETTINGS">("CONNECTIONS");
+  const [currentView, setCurrentView] = useState<"CONNECTIONS" | "CREDENTIALS" | "SETTINGS" | "MONITORING">("CONNECTIONS");
 
   // Onboarding Guide Modal State
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
@@ -179,6 +196,7 @@ export function App() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTabId, sessionTabs]);
 
   // Connection Actions Handlers
@@ -312,6 +330,10 @@ export function App() {
                 await deleteTag(id);
                 refreshConnections();
               }}
+              isCollapsed={isSidebarCollapsed}
+              onToggleCollapse={handleToggleSidebar}
+              onOpenThemeSelector={() => setIsThemeModalOpen(true)}
+              activeThemeName={allThemes.find((t) => t.id === themeId)?.name}
             />
           </div>
 
@@ -330,6 +352,7 @@ export function App() {
               }}
               onOpenOnboarding={() => setIsOnboardingOpen(true)}
               onOpenBackup={() => setIsBackupModalOpen(true)}
+              onOpenThemeSelector={() => setIsThemeModalOpen(true)}
               searchInputRef={searchInputRef}
             />
 
@@ -460,6 +483,14 @@ export function App() {
 
               {currentView === "SETTINGS" && (
                 <SettingsPage />
+              )}
+
+              {currentView === "MONITORING" && (
+                <MonitoringDashboardPage
+                  connections={connections}
+                  onConnect={handleConnect}
+                  onCheckHealth={(conn) => setHealthConnection(conn)}
+                />
               )}
             </main>
           </div>
@@ -637,7 +668,7 @@ export function App() {
       {/* Mobile Sessions Drawer / Bottom Sheet */}
       {isMobile && isMobileSessionsOpen && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex flex-col justify-end animate-in fade-in duration-200">
-          <div className="bg-[#0D1527] border-t border-border rounded-t-2xl p-4 max-h-[75vh] flex flex-col shadow-2xl pb-10">
+          <div className="bg-card border-t border-border rounded-t-2xl p-4 max-h-[75vh] flex flex-col shadow-2xl pb-10">
             <div className="flex items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <Layers className="h-5 w-5 text-cyan-400" />
@@ -685,7 +716,7 @@ export function App() {
                       key={tab.id}
                       className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
                         isTabActive
-                          ? "bg-cyan-950/60 border-cyan-500/80 shadow-md"
+                          ? "bg-primary/15 border-primary shadow-md"
                           : "bg-secondary/40 border-border hover:bg-secondary"
                       }`}
                     >
@@ -736,6 +767,15 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* Theme Selector Modal */}
+      <ThemeSelectorModal
+        isOpen={isThemeModalOpen}
+        onClose={() => setIsThemeModalOpen(false)}
+        activeThemeId={themeId}
+        onSelectTheme={setThemeId}
+        allThemes={allThemes}
+      />
     </div>
   );
 }

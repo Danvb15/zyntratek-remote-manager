@@ -182,6 +182,7 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
       }
       term.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection, startConnectionSession]);
 
   const handleDisconnect = () => {

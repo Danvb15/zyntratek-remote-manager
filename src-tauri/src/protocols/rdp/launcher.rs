@@ -89,7 +89,32 @@ impl UnixRdpLauncher {
     }
 
     fn detect_freerdp_binary() -> Result<&'static str, AppError> {
-        for bin in &["xfreerdp3", "xfreerdp", "wlfreerdp"] {
+        let candidates = ["xfreerdp3", "xfreerdp", "wlfreerdp"];
+
+        // 1. Buscar en directorios del PATH
+        if let Some(path_var) = std::env::var_os("PATH") {
+            for dir in std::env::split_paths(&path_var) {
+                for &bin in &candidates {
+                    let full_path = dir.join(bin);
+                    if full_path.is_file() {
+                        return Ok(bin);
+                    }
+                }
+            }
+        }
+
+        // 2. Buscar en rutas estándar de binarios en distribuciones Linux
+        for dir in &["/usr/bin", "/usr/local/bin", "/bin", "/snap/bin"] {
+            for &bin in &candidates {
+                let full_path = std::path::Path::new(dir).join(bin);
+                if full_path.is_file() {
+                    return Ok(bin);
+                }
+            }
+        }
+
+        // 3. Fallback a comando which si estuviera disponible
+        for &bin in &candidates {
             if std::process::Command::new("which")
                 .arg(bin)
                 .stdout(Stdio::null())
@@ -101,8 +126,9 @@ impl UnixRdpLauncher {
                 return Ok(bin);
             }
         }
+
         Err(AppError::RdpError(
-            "Cliente RDP no encontrado. Por favor instale FreeRDP (xfreerdp) en el sistema.".into(),
+            "Cliente RDP no encontrado. Por favor instale FreeRDP ejecutando: sudo apt install freerdp2-x11 (o freerdp3-x11).".into(),
         ))
     }
 }
@@ -123,6 +149,10 @@ impl RdpLauncher for UnixRdpLauncher {
         cmd.arg(format!("/v:{}", addr));
         cmd.arg(format!("/u:{}", config.username));
 
+        // CRÍTICO para Linux: Evitar que FreeRDP se bloquee pidiendo confirmación interactiva
+        // de certificado SSL/TLS en stdin, lo que corrompe la inyección de contraseña
+        cmd.arg("/cert:ignore");
+
         if let Some(d) = &config.domain {
             if !d.trim().is_empty() {
                 cmd.arg(format!("/d:{}", d.trim()));
@@ -131,6 +161,9 @@ impl RdpLauncher for UnixRdpLauncher {
 
         if config.fullscreen {
             cmd.arg("/f");
+        } else {
+            // Resolución dinámica automática en modo ventana
+            cmd.arg("/dynamic-resolution");
         }
 
         // Pass password via stdin (/from-stdin option)

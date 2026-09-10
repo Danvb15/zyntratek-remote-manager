@@ -65,7 +65,7 @@ export const ServerHealthModal: React.FC<ServerHealthModalProps> = ({
       setNeedsPassword(false);
       fetchHealth();
     }
-  }, [isOpen, connection]);
+  }, [isOpen, connection, fetchHealth]);
 
   if (!connection) return null;
 

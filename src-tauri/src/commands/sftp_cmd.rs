@@ -445,7 +445,16 @@ pub fn get_local_roots() -> Result<Vec<LocalDriveEntry>, AppError> {
         });
     }
 
+    #[cfg(not(target_os = "windows"))]
+    {
+        roots.push(LocalDriveEntry {
+            name: "Raíz del Sistema (/)".into(),
+            path: "/".into(),
+        });
+    }
+
     // Windows drives
+    #[cfg(target_os = "windows")]
     for drive_letter in b'C'..=b'Z' {
         let drive_str = format!("{}:\\", drive_letter as char);
         let path = Path::new(&drive_str);

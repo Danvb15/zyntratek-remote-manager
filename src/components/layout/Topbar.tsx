@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Search, Plus, RefreshCw, HelpCircle, Database } from "lucide-react";
+import { Search, Plus, RefreshCw, HelpCircle, Database, Palette } from "lucide-react";
 import { Protocol } from "@/types/connection";
 
 interface TopbarProps {
@@ -11,6 +11,7 @@ interface TopbarProps {
   onRefresh: () => void;
   onOpenOnboarding?: () => void;
   onOpenBackup?: () => void;
+  onOpenThemeSelector?: () => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
@@ -23,6 +24,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   onRefresh,
   onOpenOnboarding,
   onOpenBackup,
+  onOpenThemeSelector,
   searchInputRef,
 }) => {
 
@@ -126,6 +128,18 @@ export const Topbar: React.FC<TopbarProps> = ({
             >
               <Database className="h-4 w-4 text-emerald-400" />
               <span className="hidden md:inline">Respaldo</span>
+            </button>
+          )}
+
+          {/* Theme Selector Button */}
+          {onOpenThemeSelector && (
+            <button
+              onClick={onOpenThemeSelector}
+              className="p-1.5 sm:p-2 border border-border bg-secondary text-muted-foreground hover:text-cyan-400 rounded-xl hover:bg-secondary/80 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+              title="Personalizar Tema Visual (Atajo)"
+            >
+              <Palette className="h-4 w-4 text-cyan-400" />
+              <span className="hidden sm:inline">Tema</span>
             </button>
           )}
 

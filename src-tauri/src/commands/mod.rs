@@ -9,6 +9,7 @@ pub mod tag_cmd;
 pub mod vnc_cmd;
 pub mod web_cmd;
 pub mod backup_cmd;
+pub mod monitoring_cmd;
 
 
 

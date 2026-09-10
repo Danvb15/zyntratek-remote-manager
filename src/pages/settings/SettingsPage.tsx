@@ -1,10 +1,12 @@
 import React from "react";
-import { Shield, Database, Cpu, Palette, Terminal, Type, RotateCcw } from "lucide-react";
+import { Shield, Database, Cpu, Palette, Terminal, Type, RotateCcw, Check, Sparkles } from "lucide-react";
 import { useTerminalSettings } from "@/hooks/useTerminalSettings";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { TERMINAL_THEMES } from "@/types/theme";
 
 export const SettingsPage: React.FC = () => {
   const { settings, updateSettings, resetDefaults } = useTerminalSettings();
+  const { themeId, setThemeId, allThemes } = useAppTheme();
 
   const activeTheme = TERMINAL_THEMES[settings.themeName]?.theme || TERMINAL_THEMES.zyntratek.theme;
 
@@ -13,8 +15,96 @@ export const SettingsPage: React.FC = () => {
       <div>
         <h2 className="text-xl font-bold text-foreground">Configuración y Personalización</h2>
         <p className="text-xs text-muted-foreground">
-          Ajusta los temas de la terminal SSH, fuentes, cursores y revisa los componentes del sistema.
+          Ajusta los temas visuales de la interfaz, personaliza la terminal SSH y revisa los componentes del sistema.
         </p>
+      </div>
+
+      {/* App General Visual Theme Section */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-xs">
+        <div className="flex items-center gap-2.5 border-b border-border/70 pb-3">
+          <div className="p-2 bg-primary/10 text-primary border border-primary/20 rounded-xl">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-sm text-foreground">Tema Visual de la Aplicación</h3>
+            <p className="text-xs text-muted-foreground">
+              Selecciona el estilo y paleta general de Zyntratek Remote Manager
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-1">
+          {allThemes.map((t) => {
+            const isSelected = t.id === themeId;
+
+            return (
+              <div
+                key={t.id}
+                onClick={() => setThemeId(t.id)}
+                className={`p-4 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between group ${
+                  isSelected
+                    ? "border-primary bg-primary/10 shadow-md ring-1 ring-primary"
+                    : "border-border bg-secondary/40 hover:bg-secondary/70 hover:border-border"
+                }`}
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-1 mb-1">
+                    <div className="font-bold text-xs text-foreground flex items-center gap-1.5">
+                      <span>{t.name}</span>
+                      {isSelected && (
+                        <span className="p-0.5 rounded-full bg-primary text-primary-foreground">
+                          <Check className="h-2.5 w-2.5" />
+                        </span>
+                      )}
+                    </div>
+                    <span
+                      className={`text-[9px] font-mono px-1.5 py-0.2 rounded border font-semibold shrink-0 ${
+                        isSelected
+                          ? "bg-primary/20 text-primary border-primary/40"
+                          : "bg-secondary text-muted-foreground border-border"
+                      }`}
+                    >
+                      {t.badge}
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-muted-foreground leading-snug">
+                    {t.description}
+                  </p>
+                </div>
+
+                <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <span
+                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
+                      style={{ backgroundColor: t.preview.bg }}
+                      title="Fondo"
+                    />
+                    <span
+                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
+                      style={{ backgroundColor: t.preview.card }}
+                      title="Tarjeta"
+                    />
+                    <span
+                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
+                      style={{ backgroundColor: t.preview.primary }}
+                      title="Color Primario"
+                    />
+                    <span
+                      className="h-3.5 w-3.5 rounded-full border border-white/20 shadow-2xs"
+                      style={{ backgroundColor: t.preview.accent }}
+                      title="Acento"
+                    />
+                  </div>
+
+                  <span className="text-[10px] font-semibold text-foreground opacity-70 group-hover:opacity-100 group-hover:text-primary transition-colors">
+                    {isSelected ? "Activo" : "Elegir"}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Terminal Customization Section */}

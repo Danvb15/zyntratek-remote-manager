@@ -19,14 +19,15 @@ import {
   Edit2,
   Sliders,
   Layers,
+  Activity,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Palette,
 } from "lucide-react";
 
-
-
-
 interface SidebarProps {
-  currentView: "CONNECTIONS" | "CREDENTIALS" | "SETTINGS";
-  onSelectView: (view: "CONNECTIONS" | "CREDENTIALS" | "SETTINGS") => void;
+  currentView: "CONNECTIONS" | "CREDENTIALS" | "SETTINGS" | "MONITORING";
+  onSelectView: (view: "CONNECTIONS" | "CREDENTIALS" | "SETTINGS" | "MONITORING") => void;
   connections: Connection[];
   credentials: CredentialMetadata[];
   folders: Folder[];
@@ -44,6 +45,10 @@ interface SidebarProps {
   onDeleteFolder: (id: string) => void;
   onEditTag?: (tag: Tag) => void;
   onDeleteTag?: (id: string) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+  onOpenThemeSelector?: () => void;
+  activeThemeName?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -58,14 +63,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
   favoriteFilter,
   onSelectFavoriteFilter,
   selectedFolderId,
-  onSelectFolder,
   selectedTagId,
+  onSelectFolder,
   onSelectTag,
   onOpenCreateFolderModal,
   onOpenCreateTagModal,
   onDeleteFolder,
   onEditTag,
   onDeleteTag,
+  isCollapsed = false,
+  onToggleCollapse,
+  onOpenThemeSelector,
+  activeThemeName,
 }) => {
   // Counters
   const totalCount = connections.length;
@@ -82,8 +91,201 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
 
 
+  if (isCollapsed) {
+    return (
+      <aside className="w-16 border-r border-border bg-card flex flex-col h-full select-none items-center py-3 justify-between transition-all duration-300">
+        {/* Header: Logo + Expand Button */}
+        <div className="flex flex-col items-center gap-3 w-full pb-3 border-b border-border">
+          <div className="p-1 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center">
+            <img src="/logo.png" alt="Zyntratek Logo" className="h-6 w-6 object-contain" />
+          </div>
+          {onToggleCollapse && (
+            <button
+              onClick={onToggleCollapse}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              title="Expandir barra lateral"
+            >
+              <PanelLeftOpen className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Links Column */}
+        <div className="flex-1 flex flex-col items-center gap-1.5 py-3 w-full overflow-y-auto scrollbar-none">
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("ALL");
+              onSelectFavoriteFilter("ALL");
+              onSelectFolder(null);
+              onSelectTag(null);
+            }}
+            className={`p-2.5 rounded-xl transition-all relative ${
+              currentView === "CONNECTIONS" && protocolFilter === "ALL" && favoriteFilter === "ALL"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Todas las conexiones (${totalCount})`}
+          >
+            <Layers className="h-4.5 w-4.5" />
+          </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectFavoriteFilter("FAVORITES");
+              onSelectProtocolFilter("ALL");
+            }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "CONNECTIONS" && favoriteFilter === "FAVORITES"
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Favoritos (${favoritesCount})`}
+          >
+            <Star className="h-4.5 w-4.5 text-amber-400" />
+          </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("SSH");
+              onSelectFavoriteFilter("ALL");
+            }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "CONNECTIONS" && protocolFilter === "SSH" && favoriteFilter === "ALL"
+                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Sesiones SSH (${sshCount})`}
+          >
+            <Terminal className="h-4.5 w-4.5 text-emerald-400" />
+          </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("RDP");
+              onSelectFavoriteFilter("ALL");
+            }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "CONNECTIONS" && protocolFilter === "RDP" && favoriteFilter === "ALL"
+                ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Escritorio Remoto RDP (${rdpCount})`}
+          >
+            <Monitor className="h-4.5 w-4.5 text-blue-400" />
+          </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("SFTP");
+              onSelectFavoriteFilter("ALL");
+            }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "CONNECTIONS" && protocolFilter === "SFTP" && favoriteFilter === "ALL"
+                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Archivos SFTP (${sftpCount})`}
+          >
+            <FolderTree className="h-4.5 w-4.5 text-cyan-400" />
+          </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("WEB");
+              onSelectFavoriteFilter("ALL");
+            }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "CONNECTIONS" && protocolFilter === "WEB" && favoriteFilter === "ALL"
+                ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Consolas Web (${webCount})`}
+          >
+            <Globe className="h-4.5 w-4.5 text-purple-400" />
+          </button>
+
+          <button
+            onClick={() => {
+              onSelectView("CONNECTIONS");
+              onSelectProtocolFilter("VNC");
+              onSelectFavoriteFilter("ALL");
+            }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "CONNECTIONS" && protocolFilter === "VNC" && favoriteFilter === "ALL"
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Sesiones VNC (${vncCount})`}
+          >
+            <Tv className="h-4.5 w-4.5 text-amber-400" />
+          </button>
+
+          <div className="w-8 h-px bg-border my-1" />
+
+          {/* Monitoreo NOC */}
+          <button
+            onClick={() => onSelectView("MONITORING")}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "MONITORING"
+                ? "bg-cyan-600 text-white shadow-xs font-semibold"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title="Monitoreo en Vivo (NOC)"
+          >
+            <Activity className="h-4.5 w-4.5 text-cyan-400" />
+          </button>
+
+          {/* Vault */}
+          <button
+            onClick={() => onSelectView("CREDENTIALS")}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "CREDENTIALS"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title={`Vault de Credenciales (${vaultCount})`}
+          >
+            <Shield className="h-4.5 w-4.5" />
+          </button>
+
+          {/* Tema Visual */}
+          {onOpenThemeSelector && (
+            <button
+              onClick={onOpenThemeSelector}
+              className="p-2.5 rounded-xl transition-all text-muted-foreground hover:bg-secondary hover:text-cyan-400"
+              title={`Tema Visual (${activeThemeName || "Personalizar"})`}
+            >
+              <Palette className="h-4.5 w-4.5 text-cyan-400" />
+            </button>
+          )}
+        </div>
+
+        {/* Bottom Settings */}
+        <div className="pt-2 border-t border-border w-full flex justify-center">
+          <button
+            onClick={() => onSelectView("SETTINGS")}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "SETTINGS"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+            title="Configuración"
+          >
+            <Sliders className="h-4.5 w-4.5" />
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
   return (
-    <aside className="w-64 border-r border-border bg-card flex flex-col h-full select-none">
+    <aside className="w-64 border-r border-border bg-card flex flex-col h-full select-none transition-all duration-300">
       {/* Brand Header */}
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -95,9 +297,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <p className="text-[10px] text-muted-foreground font-mono">Remote Manager</p>
           </div>
         </div>
-        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          v1.1.0
-        </span>
+
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            v1.1.0
+          </span>
+          {onToggleCollapse && (
+            <button
+              onClick={onToggleCollapse}
+              className="p-1 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+              title="Plegar barra lateral"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
 
@@ -420,10 +634,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
+        {/* Monitoring / NOC Category */}
+        <div className="space-y-1 pt-2">
+          <div className="px-3 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+            Supervisión
+          </div>
+
+          <button
+            onClick={() => onSelectView("MONITORING")}
+            className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+              currentView === "MONITORING"
+                ? "bg-cyan-600 text-white shadow-xs font-semibold"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <Activity className="h-4 w-4 text-cyan-400" />
+              <span>Monitoreo en Vivo</span>
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono font-bold">
+              NOC
+            </span>
+          </button>
+        </div>
+
         {/* Security / Vault Category */}
         <div className="space-y-1 pt-2">
           <div className="px-3 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-            Seguridad
+            Seguridad & Aspecto
           </div>
 
           <button
@@ -442,6 +680,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {vaultCount}
             </span>
           </button>
+
+          {onOpenThemeSelector && (
+            <button
+              onClick={onOpenThemeSelector}
+              className="w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground group"
+              title="Personalizar Tema Visual"
+            >
+              <div className="flex items-center gap-2.5">
+                <Palette className="h-4 w-4 text-cyan-400 group-hover:rotate-12 transition-transform" />
+                <span>Tema Visual</span>
+              </div>
+              {activeThemeName && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono font-medium">
+                  {activeThemeName}
+                </span>
+              )}
+            </button>
+          )}
 
           <button
             onClick={() => onSelectView("SETTINGS")}
