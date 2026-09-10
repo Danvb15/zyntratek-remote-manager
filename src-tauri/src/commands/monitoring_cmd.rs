@@ -4,7 +4,8 @@ use tauri::{command, State};
 use tokio::net::TcpStream;
 use tokio::time::{timeout, Duration};
 
-use crate::db::{DbState, Repository};
+use crate::db::repository::Repository;
+use crate::db::DbState;
 use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

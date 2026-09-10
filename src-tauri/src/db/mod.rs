@@ -2,6 +2,8 @@ pub mod migrations;
 pub mod repository;
 pub mod schema;
 
+pub use repository::Repository;
+
 use std::sync::Mutex;
 use rusqlite::Connection;
 use crate::error::AppError;
