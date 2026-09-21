@@ -8,17 +8,20 @@ import {
   Keyboard,
   ShieldCheck,
   Zap,
+  ArrowLeft,
 } from "lucide-react";
 import { Connection } from "../../types/connection";
 
 interface VncViewerComponentProps {
   connection: Connection;
   onClose: () => void;
+  onBack?: () => void;
 }
 
 export const VncViewerComponent: React.FC<VncViewerComponentProps> = ({
   connection,
   onClose,
+  onBack,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [scaleMode, setScaleMode] = useState<"fit" | "original">("fit");
@@ -56,6 +59,16 @@ export const VncViewerComponent: React.FC<VncViewerComponentProps> = ({
       {/* Top Bar Header */}
       <div className="flex items-center justify-between px-4 py-2.5 bg-[#0F172A] border-b border-slate-800/80 select-none">
         <div className="flex items-center space-x-3">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
+              title="Volver al Panel (mantiene la sesión VNC activa de fondo)"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Volver al Panel</span>
+            </button>
+          )}
           <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
             <Monitor className="w-4 h-4" />
           </div>

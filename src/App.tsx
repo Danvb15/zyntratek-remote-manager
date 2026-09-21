@@ -134,25 +134,26 @@ export function App() {
   const [actionLoading, setActionLoading] = useState(false);
 
   // Connection Handler: Connect Button Action (Opens as a Tab)
-  const handleConnect = (conn: Connection) => {
+  const handleConnect = (conn: Connection, forceNewTab: boolean = false) => {
     if (conn.protocol === "RDP") {
       setNoticeConnection(conn);
       return;
     }
 
-    // Check if an existing tab for this connection is already open
-    const existingTab = sessionTabs.find((t) => t.connection.id === conn.id);
-    if (existingTab) {
-      setActiveTabId(existingTab.id);
+    // Check if tabs already exist for this connection
+    const sameConnTabs = sessionTabs.filter((t) => t.connection.id === conn.id);
+    if (!forceNewTab && sameConnTabs.length > 0) {
+      setActiveTabId(sameConnTabs[0].id);
       return;
     }
 
     // Create new active session tab
+    const tabSuffix = sameConnTabs.length > 0 ? ` (${sameConnTabs.length + 1})` : "";
     const newTab: SessionTab = {
       id: `session-${conn.id}-${Date.now()}`,
       connection: conn,
       protocol: conn.protocol,
-      title: conn.name,
+      title: `${conn.name}${tabSuffix}`,
     };
 
     setSessionTabs((prev) => [...prev, newTab]);
@@ -295,6 +296,8 @@ export function App() {
         activeTabId={activeTabId}
         onSelectTab={setActiveTabId}
         onCloseTab={handleCloseTab}
+        connections={connections}
+        onConnect={handleConnect}
       />
 
       {/* Contenedor Principal */}
@@ -509,25 +512,26 @@ export function App() {
               {tab.protocol === "SSH" && (
                 <SshTerminalComponent
                   connection={tab.connection}
-                  onBack={() => handleCloseTab(tab.id)}
+                  onBack={() => setActiveTabId(null)}
                 />
               )}
               {tab.protocol === "WEB" && (
                 <WebConsoleComponent
                   connection={tab.connection}
-                  onBack={() => handleCloseTab(tab.id)}
+                  onBack={() => setActiveTabId(null)}
                 />
               )}
               {tab.protocol === "VNC" && (
                 <VncViewerComponent
                   connection={tab.connection}
+                  onBack={() => setActiveTabId(null)}
                   onClose={() => handleCloseTab(tab.id)}
                 />
               )}
               {tab.protocol === "SFTP" && (
                 <SftpExplorerComponent
                   connection={tab.connection}
-                  onBack={() => handleCloseTab(tab.id)}
+                  onBack={() => setActiveTabId(null)}
                 />
               )}
             </div>

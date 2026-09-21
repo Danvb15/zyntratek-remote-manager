@@ -665,10 +665,11 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
         <div className="flex items-center space-x-3">
           <button
             onClick={onBack}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-            title="Regresar a Conexiones"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
+            title="Volver al Panel Principal (mantiene la sesión SFTP activa en segundo plano)"
           >
             <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Volver al Panel</span>
           </button>
           <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
             <FolderTree className="w-5 h-5" />

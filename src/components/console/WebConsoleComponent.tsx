@@ -102,9 +102,10 @@ export const WebConsoleComponent: React.FC<WebConsoleComponentProps> = ({
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-secondary text-xs font-semibold hover:bg-secondary/80 transition-colors"
+          title="Volver al Panel Principal (mantiene la consola activa en segundo plano)"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Volver</span>
+          <span>Volver al Panel</span>
         </button>
 
         {/* Address Bar Form */}

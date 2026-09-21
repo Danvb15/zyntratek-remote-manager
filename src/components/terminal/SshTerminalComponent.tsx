@@ -236,9 +236,10 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
           <button
             onClick={onBack}
             className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors flex items-center gap-1.5 text-xs font-medium"
+            title="Volver al Panel Principal (mantiene la sesión SSH activa en segundo plano)"
           >
             <ArrowLeft className="h-4 w-4" />
-            Volver
+            <span>Volver al Panel</span>
           </button>
           <div className="h-4 w-px bg-border" />
           <div className="flex items-center gap-2">
