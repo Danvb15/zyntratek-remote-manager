@@ -67,7 +67,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         <div className="flex items-center justify-center -top-4 relative px-1">
           <button
             onClick={onOpenCreateModal}
-            className="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-600 via-primary to-blue-500 text-white flex items-center justify-center shadow-[0_4px_16px_rgba(6,182,212,0.45)] hover:scale-105 active:scale-95 transition-transform"
+            className="w-11 h-11 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:bg-primary/90 active:scale-95 transition-transform border border-primary/20"
             title="Nueva Conexión"
           >
             <Plus className="h-5 w-5 stroke-[2.5]" />
@@ -86,7 +86,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           <div className="relative">
             <KeyRound className="h-4.5 w-4.5 mb-0.5" />
             {currentView === "CREDENTIALS" && activeTabId === null && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full" />
             )}
           </div>
           <span className="text-[10px] tracking-tight mt-0.5">Bóveda</span>
@@ -97,19 +97,19 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           onClick={onOpenSessionsModal}
           className={`flex flex-col items-center justify-center flex-1 py-1 px-1.5 rounded-xl transition-all ${
             activeTabId !== null
-              ? "text-cyan-400 font-semibold"
+              ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
           <div className="relative">
             <Layers className="h-4.5 w-4.5 mb-0.5" />
             {activeSessionCount > 0 && (
-              <span className="absolute -top-1 -right-2 bg-cyan-500 text-slate-950 font-bold text-[9px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center shadow-xs animate-bounce">
+              <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground font-bold text-[9px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center shadow-2xs">
                 {activeSessionCount}
               </span>
             )}
             {activeTabId !== null && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full" />
             )}
           </div>
           <span className="text-[10px] tracking-tight mt-0.5">Sesiones</span>

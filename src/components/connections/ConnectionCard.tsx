@@ -99,40 +99,40 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
           {connection.protocol}
         </span>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 sm:gap-0.5">
           {onCheckHealth && (isSSH || isSFTP) && (
             <button
               onClick={() => onCheckHealth(connection)}
-              className="p-1.5 text-muted-foreground hover:text-primary hover:bg-secondary rounded-md transition-colors"
+              className="min-w-[32px] min-h-[32px] flex items-center justify-center p-1.5 text-muted-foreground hover:text-primary hover:bg-secondary rounded-md transition-colors"
               title="Monitor de Rendimiento en Vivo"
             >
-              <Activity className="h-3.5 w-3.5" />
+              <Activity className="h-4 w-4" />
             </button>
           )}
           <button
             onClick={() => onDuplicate(connection)}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md transition-colors"
+            className="min-w-[32px] min-h-[32px] flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md transition-colors"
             title="Duplicar conexión"
           >
-            <Copy className="h-3.5 w-3.5" />
+            <Copy className="h-4 w-4" />
           </button>
           <button
             onClick={() => onEdit(connection)}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md transition-colors"
+            className="min-w-[32px] min-h-[32px] flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md transition-colors"
             title="Editar conexión"
           >
-            <Edit2 className="h-3.5 w-3.5" />
+            <Edit2 className="h-4 w-4" />
           </button>
           <button
             onClick={() => onDelete(connection)}
-            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+            className="min-w-[32px] min-h-[32px] flex items-center justify-center p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
             title="Eliminar conexión"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-4 w-4" />
           </button>
           <button
             onClick={() => onConnect(connection)}
-            className="ml-1 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-md hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-2xs"
+            className="ml-1.5 px-3.5 py-1.5 min-h-[34px] bg-primary text-primary-foreground text-xs font-semibold rounded-md hover:bg-primary/90 active:scale-95 transition-all flex items-center gap-1.5 shadow-2xs"
           >
             <Play className="h-3.5 w-3.5 fill-current" />
             <span>Conectar</span>

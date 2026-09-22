@@ -48,10 +48,19 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-in fade-in duration-200 select-none">
-      <div className="relative w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-md p-0 sm:p-4 animate-in fade-in duration-200 select-none"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl bg-card border-t sm:border border-border rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] sm:max-h-[90vh] pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:pb-0 animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-2 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Mobile Pull Indicator */}
+        <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-2 block sm:hidden shrink-0" />
+
         {/* Top Header */}
-        <div className="p-5 border-b border-border bg-card/80 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-border bg-card/80 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 border border-primary/20 rounded-xl text-primary">
               <ShieldCheck className="h-5 w-5" />
@@ -75,18 +84,18 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         </div>
 
         {/* Step Indicators */}
-        <div className="px-6 pt-4 flex items-center justify-between">
+        <div className="px-4 sm:px-6 pt-3 sm:pt-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             {[1, 2, 3].map((step) => (
               <button
                 key={step}
                 onClick={() => setCurrentStep(step)}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                   currentStep === step
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : currentStep > step
                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    : "bg-secondary text-muted-foreground border border-border"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {currentStep > step ? (
@@ -106,7 +115,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         </div>
 
         {/* Body Content */}
-        <div className="p-6 flex-1 min-h-[320px] flex flex-col justify-between">
+        <div className="p-4 sm:p-6 flex-1 overflow-y-auto flex flex-col justify-between">
           {/* SLIDE 1: CREAR EN EL VAULT */}
           {currentStep === 1 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-200">

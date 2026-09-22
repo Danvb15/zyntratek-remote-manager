@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { Connection } from "../../types/connection";
 import { SftpFileEditorModal } from "./SftpFileEditorModal";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export interface SftpItem {
   name: string;
@@ -95,6 +96,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
   connection,
   onBack,
 }) => {
+  const isMobile = useIsMobile();
   // Vista: 'dual' (WinSCP Commander) o 'single' (Solo Remoto)
   const [viewMode, setViewMode] = useState<"dual" | "single">("dual");
   const [activePane, setActivePane] = useState<"local" | "remote">("remote");
@@ -689,29 +691,54 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
 
         {/* Controles de Vista & Acciones Globales */}
         <div className="flex items-center space-x-2">
-          {/* Toggle Dual/Single Pane */}
-          <div className="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">
-            <button
-              onClick={() => setViewMode("dual")}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
-                viewMode === "dual" ? "bg-cyan-600 text-white shadow-xs" : "text-slate-400 hover:text-white"
-              }`}
-              title="Doble Panel: Local (PC) + Remoto (Servidor)"
-            >
-              <Columns className="w-3.5 h-3.5" />
-              <span>Doble Panel</span>
-            </button>
-            <button
-              onClick={() => setViewMode("single")}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
-                viewMode === "single" ? "bg-cyan-600 text-white shadow-xs" : "text-slate-400 hover:text-white"
-              }`}
-              title="Solo Panel Remoto"
-            >
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span>Solo Remoto</span>
-            </button>
-          </div>
+          {/* Toggle Dual/Single Pane o Segmented Mobile Switch */}
+          {isMobile ? (
+            <div className="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">
+              <button
+                onClick={() => setActivePane("remote")}
+                className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+                  activePane === "remote" ? "bg-cyan-600 text-white shadow-xs" : "text-slate-400 hover:text-white"
+                }`}
+                title="Ver archivos del servidor remoto"
+              >
+                <Server className="w-3.5 h-3.5" />
+                <span>Remoto</span>
+              </button>
+              <button
+                onClick={() => setActivePane("local")}
+                className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+                  activePane === "local" ? "bg-cyan-600 text-white shadow-xs" : "text-slate-400 hover:text-white"
+                }`}
+                title="Ver archivos del almacenamiento local"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span>Local</span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">
+              <button
+                onClick={() => setViewMode("dual")}
+                className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+                  viewMode === "dual" ? "bg-cyan-600 text-white shadow-xs" : "text-slate-400 hover:text-white"
+                }`}
+                title="Doble Panel: Local (PC) + Remoto (Servidor)"
+              >
+                <Columns className="w-3.5 h-3.5" />
+                <span>Doble Panel</span>
+              </button>
+              <button
+                onClick={() => setViewMode("single")}
+                className={`flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+                  viewMode === "single" ? "bg-cyan-600 text-white shadow-xs" : "text-slate-400 hover:text-white"
+                }`}
+                title="Solo Panel Remoto"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>Solo Remoto</span>
+              </button>
+            </div>
+          )}
 
           <button
             onClick={() => {
@@ -785,7 +812,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
       {/* ÁREA PRINCIPAL: DOS PANELES (LOCAL A LA IZQUIERDA, REMOTO A LA DERECHA) */}
       <div className="flex-1 flex overflow-hidden">
         {/* PANEL IZQUIERDO: SISTEMA LOCAL (MI PC / WINDOWS) */}
-        {viewMode === "dual" && (
+        {((!isMobile && viewMode === "dual") || (isMobile && activePane === "local")) && (
           <div
             onClick={() => setActivePane("local")}
             className={`flex-1 flex flex-col border-r border-slate-800 transition-colors ${
@@ -1036,7 +1063,8 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
         )}
 
         {/* PANEL DERECHO: SERVIDOR REMOTO (LINUX / SFTP) */}
-        <div
+        {(!isMobile || (isMobile && activePane === "remote")) && (
+          <div
           onClick={() => setActivePane("remote")}
           onDragOver={(e) => {
             e.preventDefault();
@@ -1295,6 +1323,7 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
             <span className="text-amber-400/90 font-bold">{remoteFiles.filter((f) => isFolder(f) && f.name !== "..").length} carpetas</span>
           </div>
         </div>
+        )}
       </div>
 
       {/* MENÚ CONTEXTUAL DE CLIC DERECHO FLOTANTE */}

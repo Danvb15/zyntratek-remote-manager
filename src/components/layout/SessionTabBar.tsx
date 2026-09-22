@@ -95,7 +95,7 @@ export const SessionTabBar: React.FC<SessionTabBarProps> = ({
   });
 
   return (
-    <div className="flex items-center bg-background border-b border-border px-2 pt-1 gap-1 overflow-x-auto select-none scrollbar-none shrink-0 h-10 transition-colors z-20">
+    <div className="hidden md:flex items-center bg-background border-b border-border px-2 pt-1 gap-1 overflow-x-auto select-none scrollbar-none shrink-0 h-10 transition-colors z-20">
       {/* Dashboard / Main View Tab */}
       <button
         onClick={() => onSelectTab(null)}
