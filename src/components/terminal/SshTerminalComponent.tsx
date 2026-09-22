@@ -13,16 +13,20 @@ import { useTerminalSettings } from "@/hooks/useTerminalSettings";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { TERMINAL_THEMES } from "@/types/theme";
 import { MobileTerminalKeypad } from "./MobileTerminalKeypad";
-import { Terminal as TerminalIcon, Power, ArrowLeft, KeyRound, Zap } from "lucide-react";
+import { Terminal as TerminalIcon, Power, ArrowLeft, KeyRound, Zap, Layers } from "lucide-react";
 
 interface SshTerminalComponentProps {
   connection: Connection;
   onBack: () => void;
+  onOpenSessions?: () => void;
+  activeSessionCount?: number;
 }
 
 export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
   connection,
   onBack,
+  onOpenSessions,
+  activeSessionCount = 1,
 }) => {
   const { settings } = useTerminalSettings();
   const terminalRef = useRef<HTMLDivElement | null>(null);
@@ -231,32 +235,32 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
   return (
     <div className="flex flex-col h-full w-full bg-background rounded-xl border border-border/80 overflow-hidden shadow-2xl">
       {/* Top Header Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-card/80 border-b border-border/80 select-none">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-2.5 sm:px-4 py-2 bg-card/80 border-b border-border/80 select-none shrink-0 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             onClick={onBack}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors flex items-center gap-1.5 text-xs font-medium"
+            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors flex items-center gap-1.5 text-xs font-medium shrink-0 active:scale-95"
             title="Volver al Panel Principal (mantiene la sesión SSH activa en segundo plano)"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Volver al Panel</span>
+            <ArrowLeft className="h-4 w-4 text-primary" />
+            <span className="hidden xs:inline">Panel</span>
           </button>
-          <div className="h-4 w-px bg-border" />
-          <div className="flex items-center gap-2">
-            <TerminalIcon className="h-4 w-4 text-emerald-400" />
-            <span className="font-semibold text-xs text-foreground">{connection.name}</span>
-            <span className="font-mono text-xs text-muted-foreground">
+          <div className="h-4 w-px bg-border shrink-0" />
+          <div className="flex items-center gap-1.5 min-w-0 truncate">
+            <TerminalIcon className="h-4 w-4 text-emerald-400 shrink-0" />
+            <span className="font-semibold text-xs text-foreground truncate">{connection.name}</span>
+            <span className="font-mono text-xs text-muted-foreground hidden md:inline truncate">
               ({connection.username}@{connection.host}:{connection.port})
             </span>
           </div>
         </div>
 
-        {/* Status indicator, Snippets toggle & Disconnect button */}
-        <div className="flex items-center gap-2.5">
+        {/* Status indicator, Snippets toggle, Sessions Switcher & Disconnect button */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Botón de Comandos Rápidos / Snippets */}
           <button
             onClick={() => setIsSnippetDrawerOpen((prev) => !prev)}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1.5 shadow-2xs ${
+            className={`px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1 shadow-2xs shrink-0 ${
               isSnippetDrawerOpen
                 ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
                 : "bg-secondary/60 text-muted-foreground hover:text-foreground border-border/80"
@@ -264,45 +268,53 @@ export const SshTerminalComponent: React.FC<SshTerminalComponentProps> = ({
             title="Comandos Rápidos y Snippets"
           >
             <Zap className="h-3.5 w-3.5 text-amber-400" />
-            <span>Snippets</span>
+            <span className="hidden sm:inline">Snippets</span>
           </button>
+
+          {/* Mobile Sessions Switcher Button */}
+          {onOpenSessions && (
+            <button
+              onClick={onOpenSessions}
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-primary/15 text-primary border border-primary/30 rounded-lg text-xs font-semibold shrink-0 hover:bg-primary/25 active:scale-95 transition-all shadow-2xs"
+              title="Ver todas las sesiones activas"
+            >
+              <Layers className="h-3.5 w-3.5" />
+              <span>{activeSessionCount}</span>
+            </button>
+          )}
 
           {status === "ERROR" && (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-primary-foreground text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+              className="px-2.5 py-1.5 bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-primary-foreground text-xs font-medium rounded-lg transition-colors flex items-center gap-1 shrink-0"
             >
               <KeyRound className="h-3.5 w-3.5" />
-              Ingresar Contraseña
+              <span className="hidden sm:inline">Contraseña</span>
             </button>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <span
-              className={`h-2 w-2 rounded-full ${
+              className={`h-2 w-2 rounded-full shrink-0 ${
                 status === "CONNECTED"
                   ? "bg-emerald-400 animate-pulse"
                   : status === "CONNECTING"
                   ? "bg-amber-400 animate-ping"
-                  : status === "ERROR"
-                  ? "bg-destructive"
-                  : "bg-muted-foreground"
+                  : "bg-rose-500"
               }`}
             />
-            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <span className="text-[11px] font-mono text-muted-foreground uppercase hidden sm:inline">
               {status}
             </span>
           </div>
 
-          {status === "CONNECTED" && (
-            <button
-              onClick={handleDisconnect}
-              className="px-3 py-1.5 bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive hover:text-destructive-foreground text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
-            >
-              <Power className="h-3.5 w-3.5" />
-              Desconectar
-            </button>
-          )}
+          <button
+            onClick={handleDisconnect}
+            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors shrink-0"
+            title="Desconectar y cerrar"
+          >
+            <Power className="h-4 w-4" />
+          </button>
         </div>
       </div>
 

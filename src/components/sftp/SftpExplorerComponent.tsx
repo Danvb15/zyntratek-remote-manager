@@ -29,6 +29,7 @@ import {
   ArrowLeft as ArrowLeftIcon,
   Columns,
   Maximize2,
+  Layers,
 } from "lucide-react";
 import { Connection } from "../../types/connection";
 import { SftpFileEditorModal } from "./SftpFileEditorModal";
@@ -39,8 +40,8 @@ export interface SftpItem {
   isDir?: boolean;
   is_dir?: boolean;
   size: number;
-  permissions: string;
   modified: string;
+  permissions?: string;
 }
 
 export interface SftpDirResult {
@@ -69,6 +70,8 @@ export interface LocalDriveEntry {
 interface SftpExplorerComponentProps {
   connection: Connection;
   onBack: () => void;
+  onOpenSessions?: () => void;
+  activeSessionCount?: number;
 }
 
 interface ContextMenuState {
@@ -95,6 +98,8 @@ const isFolder = (item: SftpItem | LocalItem | null | undefined): boolean => {
 export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
   connection,
   onBack,
+  onOpenSessions,
+  activeSessionCount = 1,
 }) => {
   const isMobile = useIsMobile();
   // Vista: 'dual' (WinSCP Commander) o 'single' (Solo Remoto)
@@ -691,6 +696,18 @@ export const SftpExplorerComponent: React.FC<SftpExplorerComponentProps> = ({
 
         {/* Controles de Vista & Acciones Globales */}
         <div className="flex items-center space-x-2">
+          {/* Mobile Sessions Switcher Button */}
+          {onOpenSessions && (
+            <button
+              onClick={onOpenSessions}
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 rounded-lg text-xs font-semibold shrink-0 hover:bg-cyan-500/25 active:scale-95 transition-all shadow-2xs"
+              title="Ver todas las sesiones activas"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>{activeSessionCount}</span>
+            </button>
+          )}
+
           {/* Toggle Dual/Single Pane o Segmented Mobile Switch */}
           {isMobile ? (
             <div className="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">

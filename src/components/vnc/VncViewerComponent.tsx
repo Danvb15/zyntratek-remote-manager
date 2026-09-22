@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Zap,
   ArrowLeft,
+  Layers,
 } from "lucide-react";
 import { Connection } from "../../types/connection";
 
@@ -16,12 +17,16 @@ interface VncViewerComponentProps {
   connection: Connection;
   onClose: () => void;
   onBack?: () => void;
+  onOpenSessions?: () => void;
+  activeSessionCount?: number;
 }
 
 export const VncViewerComponent: React.FC<VncViewerComponentProps> = ({
   connection,
   onClose,
   onBack,
+  onOpenSessions,
+  activeSessionCount = 1,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [scaleMode, setScaleMode] = useState<"fit" | "original">("fit");
@@ -86,7 +91,19 @@ export const VncViewerComponent: React.FC<VncViewerComponentProps> = ({
         </div>
 
         {/* Status Indicators & Controls */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          {/* Mobile Sessions Switcher Button */}
+          {onOpenSessions && (
+            <button
+              onClick={onOpenSessions}
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold shrink-0 hover:bg-amber-500/25 active:scale-95 transition-all shadow-2xs"
+              title="Ver todas las sesiones activas"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>{activeSessionCount}</span>
+            </button>
+          )}
+
           <div className="hidden sm:flex items-center space-x-3 text-xs text-slate-400 font-mono">
             <div className="flex items-center space-x-1 text-emerald-400">
               <ShieldCheck className="w-3.5 h-3.5" />

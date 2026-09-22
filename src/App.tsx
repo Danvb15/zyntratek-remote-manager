@@ -35,7 +35,7 @@ import { ThemeSelectorModal } from "@/components/theme/ThemeSelectorModal";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Connection, CreateConnectionPayload, UpdateConnectionPayload, Tag } from "@/types/connection";
 import { CredentialMetadata, CreateCredentialPayload, UpdateCredentialPayload } from "@/types/credential";
-import { Filter, X, Layers, Terminal, FolderTree, Monitor, Globe, LayoutDashboard } from "lucide-react";
+import { Filter, X, Layers, Terminal, FolderTree, Monitor, Globe, LayoutDashboard, Plus } from "lucide-react";
 
 export function App() {
   const isMobile = useIsMobile();
@@ -505,7 +505,7 @@ export function App() {
           return (
             <div
               key={tab.id}
-              className={`flex-1 h-full w-full p-2 bg-background ${
+              className={`flex-1 h-full w-full p-1 sm:p-2 bg-background ${
                 isActive ? "flex flex-col" : "hidden"
               }`}
             >
@@ -513,12 +513,16 @@ export function App() {
                 <SshTerminalComponent
                   connection={tab.connection}
                   onBack={() => setActiveTabId(null)}
+                  onOpenSessions={() => setIsMobileSessionsOpen(true)}
+                  activeSessionCount={sessionTabs.length}
                 />
               )}
               {tab.protocol === "WEB" && (
                 <WebConsoleComponent
                   connection={tab.connection}
                   onBack={() => setActiveTabId(null)}
+                  onOpenSessions={() => setIsMobileSessionsOpen(true)}
+                  activeSessionCount={sessionTabs.length}
                 />
               )}
               {tab.protocol === "VNC" && (
@@ -526,12 +530,16 @@ export function App() {
                   connection={tab.connection}
                   onBack={() => setActiveTabId(null)}
                   onClose={() => handleCloseTab(tab.id)}
+                  onOpenSessions={() => setIsMobileSessionsOpen(true)}
+                  activeSessionCount={sessionTabs.length}
                 />
               )}
               {tab.protocol === "SFTP" && (
                 <SftpExplorerComponent
                   connection={tab.connection}
                   onBack={() => setActiveTabId(null)}
+                  onOpenSessions={() => setIsMobileSessionsOpen(true)}
+                  activeSessionCount={sessionTabs.length}
                 />
               )}
             </div>
@@ -649,7 +657,7 @@ export function App() {
       />
 
       {/* Mobile Bottom Navigation Bar */}
-      {isMobile && (
+      {isMobile && activeTabId === null && (
         <MobileBottomNav
           currentView={currentView}
           onSelectView={(v) => {
@@ -767,6 +775,19 @@ export function App() {
                   );
                 })
               )}
+
+              {/* Botón para Abrir Nueva Conexión / Pestaña */}
+              <button
+                onClick={() => {
+                  setActiveTabId(null);
+                  setCurrentView("CONNECTIONS");
+                  setIsMobileSessionsOpen(false);
+                }}
+                className="w-full p-3 rounded-xl border border-dashed border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold flex items-center justify-center gap-2 transition-all mt-2 active:scale-98 shadow-2xs shrink-0"
+              >
+                <Plus className="h-4 w-4 stroke-[2.5]" />
+                <span>+ Abrir otra conexión (Nueva sesión)</span>
+              </button>
             </div>
           </div>
         </div>
