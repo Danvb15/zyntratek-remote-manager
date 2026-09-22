@@ -6,6 +6,10 @@
 [![Security Status](https://img.shields.io/badge/security-hardened-emerald.svg)](#-arquitectura-de-seguridad-y-custodia-nativa)
 [![License](https://img.shields.io/badge/license-Proprietary-slate.svg)](#)
 
+<p align="center">
+  <img src="docs/images/zyntratek_v2_hero.jpg" alt="Zyntratek Remote Manager v2.0" width="100%" />
+</p>
+
 **Zyntratek Remote Manager v2.0** es una aplicación multiplataforma (Windows, Linux, macOS y Android) de alto rendimiento diseñada para la administración centralizada y custodia segura de conexiones remotas **SSH**, **SFTP**, **VNC**, **RDP** y **Consolas WEB**.
 
 Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, MobaXterm, Royal TS y WinSCP, Zyntratek Remote Manager destaca por su arquitectura propia de aislamiento de secretos, garantizando que **ninguna contraseña ni clave privada sea almacenada en texto plano ni en la base de datos**.
@@ -24,6 +28,10 @@ Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, M
 ---
 
 ## ✨ CARACTERÍSTICAS PRINCIPALES (v2.0)
+
+<p align="center">
+  <img src="docs/images/zyntratek_v2_mobile.jpg" alt="Experiencia Móvil Zyntratek v2.0" width="480px" />
+</p>
 
 * **📱 Experiencia Móvil de Primera Clase (Android)**:
   * Modales en formato **Bottom Sheet** ergonómicos con soporte de áreas seguras (`viewport-fit=cover`).
