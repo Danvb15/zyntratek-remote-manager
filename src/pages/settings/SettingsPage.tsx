@@ -343,7 +343,7 @@ export const SettingsPage: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
           <div className="p-3 bg-secondary/50 rounded-lg border border-border">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Versión</span>
-            <span className="font-semibold text-emerald-400 font-mono">v1.1.0</span>
+            <span className="font-semibold text-emerald-400 font-mono">v2.0.0</span>
           </div>
           <div className="p-3 bg-secondary/50 rounded-lg border border-border">
             <span className="text-muted-foreground block text-[10px] uppercase font-bold">Desktop Layer</span>

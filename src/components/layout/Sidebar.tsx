@@ -300,7 +300,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            v1.1.0
+            v2.0.0
           </span>
           {onToggleCollapse && (
             <button

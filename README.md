@@ -1,13 +1,14 @@
-# Zyntratek Remote Manager
+# Zyntratek Remote Manager v2.0
 
-[![Release Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v1.0.0)
-[![Download EXE](https://img.shields.io/badge/download-Windows%20.exe-emerald.svg)](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v1.0.0)
+[![Release Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v2.0.0)
+[![Download APK](https://img.shields.io/badge/download-Android%20APK-emerald.svg)](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v2.0.0)
+[![Download EXE](https://img.shields.io/badge/download-Windows%20.exe-blue.svg)](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v2.0.0)
 [![Security Status](https://img.shields.io/badge/security-hardened-emerald.svg)](#-arquitectura-de-seguridad-y-custodia-nativa)
 [![License](https://img.shields.io/badge/license-Proprietary-slate.svg)](#)
 
-**Zyntratek Remote Manager** es una aplicación de escritorio profesional de alto rendimiento diseñada para la administración centralizada y custodia segura de conexiones remotas **SSH**, **RDP** y **Consolas WEB**.
+**Zyntratek Remote Manager v2.0** es una aplicación multiplataforma (Windows, Linux, macOS y Android) de alto rendimiento diseñada para la administración centralizada y custodia segura de conexiones remotas **SSH**, **SFTP**, **VNC**, **RDP** y **Consolas WEB**.
 
-Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, MobaXterm y Royal TS, Zyntratek Remote Manager destaca por su arquitectura propia de aislamiento de secretos, garantizando que **ninguna contraseña ni clave privada sea almacenada en texto plano ni en la base de datos**.
+Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, MobaXterm, Royal TS y WinSCP, Zyntratek Remote Manager destaca por su arquitectura propia de aislamiento de secretos, garantizando que **ninguna contraseña ni clave privada sea almacenada en texto plano ni en la base de datos**.
 
 ---
 
@@ -22,38 +23,39 @@ Inspirada en herramientas consolidadas como Windows Remote Desktop Connection, M
 
 ---
 
-## ✨ CARACTERÍSTICAS PRINCIPALES
+## ✨ CARACTERÍSTICAS PRINCIPALES (v2.0)
 
+* **📱 Experiencia Móvil de Primera Clase (Android)**:
+  * Modales en formato **Bottom Sheet** ergonómicos con soporte de áreas seguras (`viewport-fit=cover`).
+  * Teclado táctil auxiliar SSH con botones táctiles de 34px (`ESC`, `TAB`, `Ctrl+C`, flechas `↑ ↓ ← →` y pegado de portapapeles).
+  * Consola web embebida responsiva con selector de sesiones activas `[ 📑 (N) ]`.
+* **⚡ Pestañas Multi-Sesión Concurrentes**:
+  * Minimiza terminales a segundo plano sin cortar conexiones activas.
+  * Botón `+` para abrir múltiples sesiones concurrentes hacia el mismo o distintos servidores.
+* **📂 WinSCP SFTP Commander Mode**:
+  * Explorador de archivos dual/adaptable con subida y descarga de archivos en streaming y editor de archivos remoto.
 * **Protocolo SSH NATIVO**:
   * Motor asíncrono Rust sobre `russh`.
   * Autenticación por Contraseña y Clave Privada (OpenSSH).
   * PTY interactivo (`xterm-256color`) con shell dinámico (`bash`, `zsh`, `sh`).
   * Terminal gráfica integrada con `@xterm/xterm` y `@xterm/addon-fit`.
   * Verificación estricta de host keys (`known_hosts`) con prevención de ataques MitM.
-* **Protocolo RDP NATIVO**:
-  * Lanzamiento directo de `mstsc.exe` en Windows y `FreeRDP` en Linux/macOS.
-  * Monitoreo de procesos y purga automática de credenciales huérfanas al iniciar el sistema.
 * **Consolas WEB (HTTP / HTTPS)**:
   * Integración nativa de paneles de administración (Proxmox VE, pfSense, Portainer, Synology, iDRAC, Unifi).
-  * Lanzamiento en ventana ejecutable nativa (`WebviewWindowBuilder`) que omite restricciones de cabecera `X-Frame-Options`.
-* **Tutorial de Inicio Interactivo (Onboarding)**:
-  * Guía explicativa integrada en el primer lanzamiento para la creación de credenciales cifradas y asignación de conexiones.
-  * Acceso permanente desde el botón `?` (Guía) en la barra superior.
-* **Gestión de Conexiones y Vault**:
-  * Organización en carpetas jerárquicas y etiquetas personalizables con colores.
-  * Buscador global rápido con atajo `Cmd+K` / `Ctrl+K` y creación rápida `Cmd+N` / `Ctrl+N`.
-  * Modo Favoritos ⭐ e indicadores visuales de estado.
+* **Diseño Oficial Windows 11 Fluent**:
+  * Temas oficiales **Mica Light** (predeterminado), **Mica Dark** y **Slate Light**.
 
 ---
 
 ## 🚀 INSTALACIÓN Y COMPILACIÓN
 
 ### Descargar Ejecutables de Producción:
-Descarga el instalador directamente desde la página oficial de [Releases en GitHub](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v1.0.0):
-* 📄 **Windows EXE**: `Zyntratek Remote Manager_1.0.0_x64-setup.exe`
-* 📄 **Windows MSI**: `Zyntratek Remote Manager_1.0.0_x64_en-US.msi`
-* 🐧 **Linux AppImage**: `zyntratek-remote-manager_1.0.0_amd64.AppImage`
-* 🐧 **Linux DEB**: `zyntratek-remote-manager_1.0.0_amd64.deb`
+Descarga el instalador directamente desde la página oficial de [Releases en GitHub](https://github.com/Danvb15/zyntratek-remote-manager/releases/tag/v2.0.0):
+* 📱 **Android APK**: `zyntratek-remote-manager-signed.apk`
+* 📄 **Windows EXE**: `Zyntratek Remote Manager_2.0.0_x64-setup.exe`
+* 📄 **Windows MSI**: `Zyntratek Remote Manager_2.0.0_x64_en-US.msi`
+* 🐧 **Linux AppImage**: `zyntratek-remote-manager_2.0.0_amd64.AppImage`
+* 🐧 **Linux DEB**: `zyntratek-remote-manager_2.0.0_amd64.deb`
 
 ### 🐧 Cómo Ejecutar en Linux desde la Terminal (Versión Empaquetada de Producción):
 
