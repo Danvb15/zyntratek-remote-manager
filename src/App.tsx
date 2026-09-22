@@ -356,6 +356,8 @@ export function App() {
               onOpenOnboarding={() => setIsOnboardingOpen(true)}
               onOpenBackup={() => setIsBackupModalOpen(true)}
               onOpenThemeSelector={() => setIsThemeModalOpen(true)}
+              onOpenSettings={() => setCurrentView("SETTINGS")}
+              currentView={currentView}
               searchInputRef={searchInputRef}
             />
 
@@ -485,7 +487,7 @@ export function App() {
               )}
 
               {currentView === "SETTINGS" && (
-                <SettingsPage />
+                <SettingsPage onBack={() => setCurrentView("CONNECTIONS")} />
               )}
 
               {currentView === "MONITORING" && (

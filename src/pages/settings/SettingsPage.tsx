@@ -1,10 +1,14 @@
 import React from "react";
-import { Shield, Database, Cpu, Palette, Terminal, Type, RotateCcw, Check } from "lucide-react";
+import { Shield, Database, Cpu, Palette, Terminal, Type, RotateCcw, Check, ArrowLeft } from "lucide-react";
 import { useTerminalSettings } from "@/hooks/useTerminalSettings";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { TERMINAL_THEMES } from "@/types/theme";
 
-export const SettingsPage: React.FC = () => {
+interface SettingsPageProps {
+  onBack?: () => void;
+}
+
+export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
   const { settings, updateSettings, resetDefaults } = useTerminalSettings();
   const { themeId, setThemeId, allThemes } = useAppTheme();
 
@@ -12,6 +16,17 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-5xl select-none">
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-secondary text-xs font-semibold hover:bg-secondary/80 text-foreground transition-all active:scale-95 shadow-2xs w-fit"
+          title="Volver a Conexiones"
+        >
+          <ArrowLeft className="h-4 w-4 text-primary" />
+          <span>Volver a Conexiones</span>
+        </button>
+      )}
+
       <div>
         <h2 className="text-xl font-bold text-foreground">Configuración y Personalización</h2>
         <p className="text-xs text-muted-foreground">

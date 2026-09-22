@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Search, Plus, RefreshCw, HelpCircle, Database, Sun, Moon } from "lucide-react";
+import { Search, Plus, RefreshCw, HelpCircle, Database, Sun, Moon, Sliders } from "lucide-react";
 import { Protocol } from "@/types/connection";
 
 interface TopbarProps {
@@ -12,6 +12,8 @@ interface TopbarProps {
   onOpenOnboarding?: () => void;
   onOpenBackup?: () => void;
   onOpenThemeSelector?: () => void;
+  onOpenSettings?: () => void;
+  currentView?: "CONNECTIONS" | "CREDENTIALS" | "SETTINGS" | "MONITORING";
   searchInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
@@ -25,6 +27,8 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenOnboarding,
   onOpenBackup,
   onOpenThemeSelector,
+  onOpenSettings,
+  currentView,
   searchInputRef,
 }) => {
   useEffect(() => {
@@ -140,6 +144,22 @@ export const Topbar: React.FC<TopbarProps> = ({
               <Sun className="h-4 w-4 block dark:hidden text-amber-500" />
               <Moon className="h-4 w-4 hidden dark:block text-blue-400" />
               <span className="hidden sm:inline">Tema</span>
+            </button>
+          )}
+
+          {/* Settings Button */}
+          {onOpenSettings && (
+            <button
+              onClick={onOpenSettings}
+              className={`p-1.5 sm:p-2 border border-border bg-card hover:text-foreground rounded-md hover:bg-secondary transition-colors flex items-center gap-1.5 text-xs font-medium ${
+                currentView === "SETTINGS"
+                  ? "text-primary border-primary/40 bg-secondary font-semibold"
+                  : "text-muted-foreground"
+              }`}
+              title="Configuración"
+            >
+              <Sliders className="h-4 w-4" />
+              <span className="hidden sm:inline">Ajustes</span>
             </button>
           )}
 
