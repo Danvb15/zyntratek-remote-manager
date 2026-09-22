@@ -1,6 +1,6 @@
 # DOCUMENTACIÓN Y POLÍTICA DE RELEASE
 
-**Zyntratek Remote Manager v1.0.0**
+**Zyntratek Remote Manager v2.0.0**
 
 ---
 
